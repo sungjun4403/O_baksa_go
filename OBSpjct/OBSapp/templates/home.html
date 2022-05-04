@@ -9,11 +9,21 @@
     <title>Home</title>
 </head>
 <body>
-    <div align = "middle">
-        <br><br><br><br><br><br><br>
-        <form action = "{% url 'input' %}">
-            <button type="submit" class="btn btn-primary btn-lg">START</button>
-        </form>
-    </div>
+<div align = "middle">
+    <br><br><br><br><br><br><br>
+    <form action = "{% url 'input' %}">
+        <button type="submit" class="btn btn-primary btn-lg">START</button>
+    </form>
+    <br>
+
+{% if user.is_authenticated and user.is_staff %}
+    <form action = "{% url 'admin:index' %}">
+        <button type="submit" class="btn btn-primary btn-lg">go to Admin</button>
+    </form>
+{% endif %}
+
+</div>
+
+
 </body>
 </html>

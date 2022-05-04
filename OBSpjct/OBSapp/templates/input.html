@@ -11,17 +11,40 @@
 </head>
 <body>
 <br><br><br><br>
-<div style = "max-width: 50%x;">
+<div style = "max-width: 50%;">
+  <form action = "{% url 'get_options' %}" method = "POST">
+    {% csrf_token %}
+    
     <div class="input-group mb-3">
         <span class="input-group-text" id="inputGroup-sizing-default">Destination</span>
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-    </div>
-    <div class="input-group">
         <div class="input-group-text">
-            <input class="form-check-input mt-0" type="radio" value="" aria-label="Radio button for following text input">
+          <input class="form-check-input mt-0" type="checkbox" name = "ifsame" value= "1" aria-label="Checkbox for following text input">
         </div>
-        <input type="text" class="form-control" aria-label="Text input with radio button">
+        <input type="text" class="form-control" name = "Destination" aria-label="Text input with checkbox">
     </div>
+    
+    <br>
+    <!-- =========================================================== -->
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default">Starting Point</span>
+        <input type="text" class="form-control" name = "Starting_Point" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <p class="mt-5 mb-3 text-muted">essential!</p>
+
+    <br>
+    <!-- =========================================================== -->
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default">Max length (m)</span>
+        <input type="text" class="form-control" aria-label="Sizing example input" name = "Max_Length" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <p class="mt-5 mb-3 text-muted">defalut == 100000</p>
+
+    <br>
+    <!-- =========================================================== -->
+    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+
+
+  </form>
 </div>
 
 </body>
