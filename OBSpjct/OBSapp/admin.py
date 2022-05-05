@@ -3,5 +3,6 @@ from .models import *
 
 @admin.register(map_data)
 class map_dataAdmin(admin.ModelAdmin):
-    list_display = ['map_name', 'map_graph', 'id']
+    list_display = ['map_name', 'map_graph', 'map_image', 'id']
+
 

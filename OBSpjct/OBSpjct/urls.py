@@ -24,5 +24,6 @@ urlpatterns = [
     path('', obs.home, name = "home"),
     path('input/', obs.input, name = "input"),
     path('get_options/', obs.get_options, name = "get_options"),
+    path('end/', obs.end, name = "end")
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

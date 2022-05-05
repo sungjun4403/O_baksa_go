@@ -25,5 +25,8 @@ def get_options(request):
         return redirect ('input')
     if str(Starting_Point).strip() == "" :
         return redirect ('input')
-
+    
     return render(request, 'show_options.html', {})
+
+def end(request):
+    return render (request, 'end.html')
