@@ -11,6 +11,5 @@ urlpatterns = [
     path('get_options/', obs.get_options, name = "get_options"),
     path('end/', obs.end, name = "end"),
     path('get_map/', obs.get_map, name = "get_map"),
-    path('show_map/', obs.show_map, name = "show_map"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
