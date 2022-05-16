@@ -32,7 +32,6 @@ matplotlib.use('Agg')
 
 # Create your views here.
 def home (request):
-    SPL = google_geocode('경기 성남시 분당구 서현동 291')  
     return render(request, 'home.html')
 
 def input (request):
@@ -118,9 +117,13 @@ def google_geocode (got_place):
     llst.append(lst[0].get('types')[0])
     print(llst)
     return llst
-    
+
+
 def get_cvs (got_place):
     # gmaps = googlemaps.
+
+    return None
+
 
 def end(request):
     return render (request, 'end.html')

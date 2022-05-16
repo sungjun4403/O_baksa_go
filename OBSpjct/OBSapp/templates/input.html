@@ -9,8 +9,8 @@
 
     <title>Input</title>
 </head>
-<body>
-<br><br><br><br>
+<body onload="initMap()">
+<br><br>
 <div style = "max-width: 50%;">
   <form action = "{% url 'get_options' %}" method = "POST">
     {% csrf_token %}
@@ -22,28 +22,34 @@
         </div>
         <input type="text" class="form-control" name = "Destination" aria-label="Text input with checkbox">
     </div>
-    
-    <br>
     <!-- =========================================================== -->
     <div class="input-group mb-3">
         <span class="input-group-text" id="inputGroup-sizing-default">Starting Point</span>
-        <input type="text" class="form-control" name = "Starting_Point" aria-label="Text input with checkbox">
+        <input type="text" class="form-control" name = "Starting_Point" aria-label="Text input with checkbox" required>
         <!-- 참고항목은 필요 X -->
-    </div>  
+    </div>
+    <br>  
     <!-- =========================================================== -->
     <input type="text" class="form-control" name = "SP_postcode" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_postcode" placeholder="우편번호">
-    <input type="text" class="form-control" name = "SP_address" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_address" placeholder="주소">
+    <input type="text" class="form-control" name = "SP_address" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_address" required placeholder="주소 또는 좌표">
     <input type="text" class="form-control" name = "SP_detailAddress" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_detailAddress" placeholder="상세주소">
     <input type="text" class="form-control" name = "SP_exrtraAddress" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_extraAddress" placeholder="참고항목">
     <br>
     <!-- =========================================================== -->
-    <button type="button" onclick="sample3_execDaumPostcode()" class="btn btn-secondary" style="margin-left:1.5%; border-radius: 4px;">우편번호로 주소찾기</button> 
+    <button type="button" onclick="sample3_execDaumPostcode();" class="btn btn-secondary" style="margin-left:1.5%; border-radius: 4px;">우편번호로 주소찾기</button> 
     <button type="button" class="btn btn-secondary" style="margin-left: 1%; border-radius: 4px;">지도로 주소찾기</button>
+    <button type="button" onclick="getUserLoaction();" class="btn btn-outline-secondary" style="margin-left: 1%;" >현위치</button>
+    <button type="button" onclick="changeCenter();" class="btn btn-outline-secondary" style="margin-left: 1%;" >지도 재조정</button>
+    <button type="button" onclick="codeAddress();" class="btn btn-outline-secondary" style="margin-left: 1%;" >지도 재조정</button>
+    <br><br>
+    <div id="map" style="width:90%; height:300px;"></div>
+
     <!-- =========================================================== -->
   <div id="wrap" style="display:none;border:1px solid;width:500px;height:300px;margin:5px 0;position:relative">
   <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnFoldWrap" style="cursor:pointer;position:absolute;right:0px;top:-1px;z-index:1" onclick="foldDaumPostcode()" alt="접기 버튼">
   </div>
 
+  <!-- 다음 우편번호 -->
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
       // 우편번호 찾기 찾기 화면을 넣을 element
@@ -120,11 +126,69 @@
           element_wrap.style.display = 'block';
       }
   </script>
-    <p class="mt-5 mb-3 text-muted">essential!</p>
-    <br>
-    
 
-    <br>
+  <!-- geolocation -->
+  <script>
+    var options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    };
+
+    const errorCallback = (error) => {
+      console.error(error);
+    };
+
+    function getUserLoaction () {
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    }
+
+    function successCallback (event) {
+      document.getElementById('sample3_address').value = String(event.coords.latitude) + ", " + String(event.coords.longitude);
+    }
+  </script>
+
+  <!-- google dynamic map -->
+  <script>
+    let map;
+
+    function initMap() {
+      geocoder = new google.maps.Geocoder();
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 37.566535, lng: 126.977969 },
+        zoom: 8,
+      });
+    }
+
+    function changeCenter(){  
+      map.panTo("경기 성남시 분당구 서현동 291");
+      map.setZoom(17);
+    }
+
+    window.initMap = initMap;
+  </script>
+
+  <!-- js geocoding -->
+  <script>
+    
+    function codeAddress() {
+      var address = document.getElementById('sample3_address').value;
+      geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == 'OK') {
+          map.setCenter(results[0].geometry.location);
+          var marker = new google.maps.Marker({
+              map: map,
+              position: results[0].geometry.location
+          });
+        } 
+        else {
+          alert('Geocode was not successful for the following reason: ' + status);
+        }
+      });
+    }
+  </script>
+
+    <br><br>
     <!-- =========================================================== -->
     <div class="input-group mb-3">
         <span class="input-group-text" id="inputGroup-sizing-default">Max length (m)</span>
@@ -132,14 +196,17 @@
     </div>
     <p class="mt-5 mb-3 text-muted">defalut == 100000</p>
 
-    <br><br><br>
+    <br>
 
     <!-- =========================================================== -->
     <button type="submit" class="btn btn-primary btn-lg">Submit</button>
-
+    <br><br><br>
 
   </form>
 </div>
 
 </body>
 </html>
+
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDks17rZCFjI_zz5dOQojRHWmYAZ2ZvKA8&callback=initMap"></script>
+
