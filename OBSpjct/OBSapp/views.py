@@ -40,19 +40,18 @@ def input (request):
 def get_options(request):
     ifsame = request.POST.get('ifsame')
     Destination = request.POST.get('Destination')
-    #Starting_Point, 참고항목은 안받음
-    POST_CODE = request.POST.get('SP_postcode')      #일단은 unnecessary 해보임 
-    ADDRESS = request.POST.get('SP_address')        #지번 주소이거나 우편주소이거나 
-    DETAILED_ADDRESS = request.POST.get('SP_deatilAddress')   
-    ETC = request.POST.get('SP_extraaddress')        ##일단은 unnecessary 해보임 
-
+    Starting_Point = request.POST.get('Starting_Point')
     Max_Length = request.POST.get('Max_Length')
+    ifMT1 = request.POST.get('MT1')
+    ifCS2 = request.POST.get('CS2')
+    #0 : postcode / 1 : address / 2 : detailAddress / 3 : extraAddress
+    Starting_Point_list = Starting_Point.split(" / ")
+    Destination_Point_list = Destination.split(" / ")
+    for p in range (0, len(Starting_Point_list)-1): Starting_Point_list[p] = str(Starting_Point_list[p]).strip()
+    for q in range (0, len(Destination_Point_list)-1): Destination_Point_list[q] = str(Destination_Point_list[q]).strip()
 
-    Starting_Point = str(POST_CODE) + " " +  str(ADDRESS) + " " + str(DETAILED_ADDRESS) + " " + str(ETC)
-
-    print(ifsame)
-    print(Destination)
-    print(Starting_Point)
+    ADDRESS = Starting_Point_list[1]        
+    address = Destination_Point_list[1]       
 
     try:  
         if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
@@ -62,52 +61,169 @@ def get_options(request):
 
     except:
         return redirect('input')        #숫자가 아닐떄
-
-    if ifsame == '1':
-        Destination = Starting_Point    #출발지 = 목적지 일떄
     
     if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
-        Max_Length = 100000
+        Max_Length = 5000
 
-    if str(Destination).strip() == "" and ifsame == "0" :     #위에서 안걸렸는데 값이 안들어왔을떄
-        return redirect ('input')
-    if str(Starting_Point).strip() == "" :      #시작점이 안들어왔을 떄
-        return redirect ('input')
+    #받을떄 좌표로 받으면 geocoding 스킵하는 로직 
+    #SPL, DPL / 0 : location (lat, lng) / 1 : address / 2 : address_type
+    SPL = [None] * 3        
+    ADS = ADDRESS
+    try:
+        int(ADDRESS[5:9])
+        SPLformat = "loc"
+        ADDRESS = ADS
+    except:
+        SPLformat = "notloc"
 
-    SPL = google_geocode(str(ADDRESS))
-
-    get_map(ifsame, SPL, 'DL', Max_Length)
-
-    return render(request, 'show_options.html')
-
-
-def get_map (ifsame, SPL, DL, Max_Length):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
+    if SPLformat == "loc":
+        SPL[0] = ADDRESS
+        SPL[2] = 'location'
+        print(str(SPL[0][:10]) + " " + str(SPL[0][12:])) 
+        print("=================")
+        print("location")
+        print("=================")
+    else:
+        SPL = google_geocode(str(ADDRESS))
     
-    import sys,os
-    sys.path.append(os.path.realpath('..'))
-    start = time.time() 
-    
-    ox.config(use_cache = True, log_console = True)
-    ox.__version__
+    DPL = [None] * 3
+    ads = address
+    try:
+        int(address[5:9])
+        DPLformat = "loc"
+        address = ads
+    except:
+        DPLformat = "notloc"
 
-    G = ox.graph_from_address (SPL[0], network_type = 'drive_service')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
-    ox.plot_graph(G, node_size = 0.5, node_color = 'blue')
-    plt.savefig("graphimage.png", format="PNG")
-
-    end = time.time()       #프로세스 소요 시간 
-    process_time = round(end - start, 4)
+    if DPLformat == "loc":
+        DPL[0] = address
+        DPL[2] = 'location'
+        print(str(DPL[0][:10]) + " " + str(DPL[0][12:])) 
+        print("=================")
+        print("location")
+        print("=================")
+    else:
+        DPL = google_geocode(str(address))
     
-    print()
-    print("===========================")
-    print(str(process_time) + " sec")
-    print("===========================")
-    print()
-
     
+    #주변 편의점, 마트 
+    if ifCS2 == "True": 
+        CS2 = search_CS2(SPL, DPL, ifsame, Max_Length)
+        CS2L = getlst(CS2)
+    else: 
+        CS2 = []
+        CS2L = []
+    if ifMT1 == "True": 
+        MT1 = search_MT1(SPL, DPL, ifsame, Max_Length)
+        MT1L = getlst(MT1)
+    else: 
+        MT1 = []
+        MT1L = []
+    print(SPL)
+    print(DPL)
+    
+    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L)
+    time.sleep(0.1)
+    os.system("python manage.py collectstatic --no-input")
+    print("**********************************************************************************************************************************************************************")
+    return render(request, 'show_options.html', {'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2}) 
+
+
+def end(request):
+    return render (request, 'end.html')
+
+
+def search_CS2(SPL, DPL, ifsame, Max_Length):        #MT1, CS2, 
+    loc = SPL[0].split(", ")
+    rest_api_key = '39b09cd965f4787143f206403f3f370b'
+    header = {'Authorization': 'KakaoAK ' + rest_api_key}
+    params = {
+        'x' : float(loc[1]), 
+        'y' : float(loc[0]),
+        'radius' : int(Max_Length), 
+        'page' : 10,      #tochange
+        'size' : 15,
+        'sort' : 'distance', 
+        } 
+    keywords = '편의점'
+    url = 'https://dapi.kakao.com/v2/local/search/keyword.json?query={}'.format(keywords)
+    places = requests.get(url, headers=header, params=params).json()
+    places = places.get('documents')
+    lst = []
+    # 0 : address_name / 1 : category_group_code / 2 : category_group_name / 3 : category_name / 4 : distance / 5 : id / 6 : phone / 7 : place_name / 8 : place_url / 9 : road_address_name / 10 : x / 11 : y
+    for i in places:
+        if i.get('category_group_code') == "CS2":
+            to_append_list = []
+            to_append_list.append(i.get('address_name'))
+            to_append_list.append(i.get('category_group_code'))
+            to_append_list.append(i.get('category_group_name'))
+            to_append_list.append(i.get('category_name'))
+            to_append_list.append(i.get('distance'))
+            to_append_list.append(i.get('id'))
+            to_append_list.append(i.get('phone'))
+            to_append_list.append(i.get('place_name'))
+            to_append_list.append(i.get('place_url'))
+            to_append_list.append(i.get('road_address_name'))
+            to_append_list.append(i.get('x'))
+            to_append_list.append(i.get('y'))
+            lst.append(to_append_list)
+        else: pass
+    return lst
+
+
+def search_MT1(SPL, DPL, ifsame, Max_Length):        #MT1, CS2, 
+    loc = SPL[0].split(", ")
+    rest_api_key = '39b09cd965f4787143f206403f3f370b'
+    header = {'Authorization': 'KakaoAK ' + rest_api_key}
+    params = {
+        'x' : float(loc[1]), 
+        'y' : float(loc[0]),
+        'radius' : int(Max_Length), 
+        'page' : 10,      #tochange
+        'size' : 15,
+        'sort' : 'distance', 
+        } 
+    keywords = '마트'
+    url = 'https://dapi.kakao.com/v2/local/search/keyword.json?query={}'.format(keywords)
+    places = requests.get(url, headers=header, params=params).json()
+    places = places.get('documents')
+    lst = []
+    # 0 : address_name / 1 : category_group_code / 2 : category_group_name / 3 : category_name / 4 : distance / 5 : id / 6 : phone / 7 : place_name / 8 : place_url / 9 : road_address_name / 10 : x / 11 : y
+    for i in places:
+        if i.get('category_group_code') == "CS2": pass
+        else:
+            to_append_list = []
+            to_append_list.append(i.get('address_name'))
+            to_append_list.append(i.get('category_group_code'))
+            to_append_list.append(i.get('category_group_name'))
+            to_append_list.append(i.get('category_name'))
+            to_append_list.append(i.get('distance'))
+            to_append_list.append(i.get('id'))
+            to_append_list.append(i.get('phone'))
+            to_append_list.append(i.get('place_name'))
+            to_append_list.append(i.get('place_url'))
+            to_append_list.append(i.get('road_address_name'))
+            to_append_list.append(i.get('x'))
+            to_append_list.append(i.get('y'))
+            lst.append(to_append_list)
+        
+    return lst
+
+
+def getlst (places):
+    lst = []
+    for place in places:
+        to_append_lst = [] 
+        to_append_lst.append(place[10])
+        to_append_lst.append(place[11])
+        lst.append(to_append_lst)
+    
+    return lst
+
+
 def google_geocode (got_place):
     gmaps = googlemaps.Client(key = 'AIzaSyAawgC_tb1v8ro5BYuGs7BbhcuqYfI26ws')
-    got_geocode = gmaps.geocode(got_place)
-    print(got_geocode)
+    got_geocode = gmaps.geocode((got_place), language='ko')
     lst = got_geocode
     llst = []       #[0] : location x, y / [1] : formatted_address / [2] : address_type 
     loc_to_append = str(lst[0].get('geometry').get('location').get('lat'))
@@ -115,15 +231,69 @@ def google_geocode (got_place):
     llst.append(loc_to_append)
     llst.append(lst[0].get('formatted_address'))
     llst.append(lst[0].get('types')[0])
-    print(llst)
     return llst
 
 
-def get_cvs (got_place):
-    # gmaps = googlemaps.
+def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
+    
+    sys.path.append(os.path.realpath('..'))
+    start = time.time() 
+    
+    ox.config(use_cache = True, log_console = True)
+    ox.__version__
 
-    return None
+    G = ox.graph_from_address (SPL[0], network_type = 'drive_service')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
+
+    spl = SPL[0].split(", ")
+    spllat = float(str(spl[0]).strip())
+    spllng = float(str(spl[1]).strip())
+    orgn = ox.nearest_nodes(G, spllng, spllat)
+
+    dpl = DPL[0].split(", ")
+    dpllat = float(str(dpl[0]).strip())
+    dpllng = float(str(dpl[1]).strip())
+    dstn = ox.nearest_nodes(G, dpllng, dpllat)
+
+    route = ox.shortest_path(G, orgn, dstn, weight = 'length')
+
+    ox.plot_graph_route(G, route, orig_dest_size=1, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 0)
+
+    end = time.time()       #프로세스 소요 시간 
+    process_time = round(end - start, 4)
+    
+    print()
+    print("===========================")
+    print(str(process_time) + " sec")
+    print(orgn)
+    print(dstn)
+    print(route)
+    print("===========================")
+    print()
 
 
-def end(request):
-    return render (request, 'end.html')
+
+def forCS1(Max_Legnth):
+    rslt = []
+    prcs = []
+    for p in range (0, Max_Legnth, 100):
+        for src in search_CS2:
+            prcs.append(src)
+    for q in range(0, len(prcs), 1):
+        if prcs[q] in rslt:
+            pass
+        else: rslt.append(prcs[q])
+    return rslt 
+
+
+def forMT1(Max_Length):
+    rslt = []
+    prcs = []
+    for p in range (0, Max_Length, 100):
+        for src in search_MT1:
+            prcs.append(src)
+    for q in range (0, len(prcs), 1):
+        if prcs[q] in rslt:
+            pass
+        else: rslt.append(prcs[q])
+    print(rslt)
+    return rslt

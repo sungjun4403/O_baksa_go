@@ -9,40 +9,55 @@
 
     <title>Input</title>
 </head>
-<body onload="initMap()">
+<body onload="onclickSP();">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDks17rZCFjI_zz5dOQojRHWmYAZ2ZvKA8"></script>
 <br><br>
-<div style = "max-width: 50%;">
+{% load static %}
+<link href="{% static 'css/1.css'%}" rel="stylesheet">
+<div id = "wrapper">
   <form action = "{% url 'get_options' %}" method = "POST">
     {% csrf_token %}
     
     <div class="input-group mb-3">
-        <span class="input-group-text" id="inputGroup-sizing-default">Destination</span>
+        <span class="input-group-text" id="">Destination</span>
         <div class="input-group-text">
-          <input class="form-check-input mt-0" type="checkbox" name = "ifsame" value= "1" aria-label="Checkbox for following text input">
+          <input class="form-check-input mt-0" type="checkbox" name = "ifsame" value= "1" aria-label="Checkbox for following text input" id = "ifsame" onclick = "onclickIfsame()">
         </div>
-        <input type="text" class="form-control" name = "Destination" aria-label="Text input with checkbox">
+        <input type="text" class="form-control" name = "Destination" aria-label="Text input with checkbox" id = "DP" required>
     </div>
     <!-- =========================================================== -->
     <div class="input-group mb-3">
-        <span class="input-group-text" id="inputGroup-sizing-default">Starting Point</span>
-        <input type="text" class="form-control" name = "Starting_Point" aria-label="Text input with checkbox" required>
+        <span class="input-group-text" id="">Starting Point</span>
+        <input type="text" class="form-control" name = "Starting_Point" aria-label="Text input with checkbox" required id = "SP">
         <!-- 참고항목은 필요 X -->
     </div>
+
+    <div id="map" style="width:90%; height:300px;"></div>
     <br>  
     <!-- =========================================================== -->
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked onclick = "onclickSP();">
+      <label class="form-check-label" for="inlineRadio1">send to SP</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" onclick = "onclickDP();">
+      <label class="form-check-label" for="inlineRadio2">send to DP</label>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick = "sendInfoSP();" id = "radioSP">send to SP</button>
+    <button type="button" class="btn btn-secondary btn-sm" onclick = "sendInfoDP();" id = "radioDP">send to DP</button>
+    <br><br>
+    <!-- =========================================================== -->
     <input type="text" class="form-control" name = "SP_postcode" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_postcode" placeholder="우편번호">
-    <input type="text" class="form-control" name = "SP_address" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_address" required placeholder="주소 또는 좌표">
+    <input type="text" class="form-control" name = "SP_address" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_address" placeholder="주소 또는 좌표">
     <input type="text" class="form-control" name = "SP_detailAddress" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_detailAddress" placeholder="상세주소">
     <input type="text" class="form-control" name = "SP_exrtraAddress" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_extraAddress" placeholder="참고항목">
     <br>
     <!-- =========================================================== -->
-    <button type="button" onclick="sample3_execDaumPostcode();" class="btn btn-secondary" style="margin-left:1.5%; border-radius: 4px;">우편번호로 주소찾기</button> 
-    <button type="button" class="btn btn-secondary" style="margin-left: 1%; border-radius: 4px;">지도로 주소찾기</button>
-    <button type="button" onclick="getUserLoaction();" class="btn btn-outline-secondary" style="margin-left: 1%;" >현위치</button>
-    <button type="button" onclick="changeCenter();" class="btn btn-outline-secondary" style="margin-left: 1%;" >지도 재조정</button>
-    <button type="button" onclick="codeAddress();" class="btn btn-outline-secondary" style="margin-left: 1%;" >지도 재조정</button>
+    <button type="button" onclick="sample3_execDaumPostcode(); changeCenter();" class="btn btn-secondary" style="margin-left:1.5%; border-radius: 4px;">우편번호로 주소찾기</button> 
+    <button type="button" onclick="getUserLoaction(); changeCenter();" class="btn btn-outline-secondary" style="margin-left: 1%;" >현위치</button>
+    <button type="button" onclick="changeCenter1();" class="btn btn-outline-secondary" style="margin-left: 1%;" >지도 재조정</button>
     <br><br>
-    <div id="map" style="width:90%; height:300px;"></div>
+    
 
     <!-- =========================================================== -->
   <div id="wrap" style="display:none;border:1px solid;width:500px;height:300px;margin:5px 0;position:relative">
@@ -127,7 +142,7 @@
       }
   </script>
 
-  <!-- geolocation -->
+  <!-- geolocation 현위치-->
   <script>
     var options = {
       enableHighAccuracy: true,
@@ -148,45 +163,161 @@
     }
   </script>
 
-  <!-- google dynamic map -->
+  <!-- google js geocoder !!--> 
   <script>
-    let map;
-
-    function initMap() {
-      geocoder = new google.maps.Geocoder();
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 37.566535, lng: 126.977969 },
-        zoom: 8,
-      });
+    let geocoder;
+    function jsgeocode(to_geocode) {
+      geocoder = new google.maps.Geocoder()
+      geocoder.geocode({'address' : to_geocode}, function(result, status){
+        lat = parseFloat(result[0].geometry.location.lat())
+        lng = parseFloat(result[0].geometry.location.lng())
+      }) 
     }
-
-    function changeCenter(){  
-      map.panTo("경기 성남시 분당구 서현동 291");
-      map.setZoom(17);
-    }
-
-    window.initMap = initMap;
   </script>
 
-  <!-- js geocoding -->
+  <!-- send info -->
   <script>
+    function onclickSP() {
+      document.getElementById('radioDP').style.visibility = 'hidden';
+      document.getElementById('radioSP').style.visibility = 'visible';
+
+    }
+    function onclickDP() {
+      document.getElementById('radioSP').style.visibility = 'hidden';
+      document.getElementById('radioDP').style.visibility = 'visible';
+    }
+    function sendInfoSP() {
+      SP1 = document.getElementById('sample3_postcode').value
+      SP2 = document.getElementById('sample3_address').value
+      SP3 = document.getElementById('sample3_detailAddress').value
+      SP4 = document.getElementById('sample3_extraAddress').value
+
+      setTimeout(function() {
+        document.getElementById('SP').value = String(SP1) + " / " + String(SP2) + " / " + String(SP3) + " / " + String(SP4)
+      }, 100);
+      
+      document.getElementById('sample3_postcode').value = ""
+      document.getElementById('sample3_address').value = ""
+      document.getElementById('sample3_detailAddress').value = ""
+      document.getElementById('sample3_extraAddress').value = ""
+    }
+    function sendInfoDP() {
+      DP1 = document.getElementById('sample3_postcode').value
+      DP2 = document.getElementById('sample3_address').value
+      DP3 = document.getElementById('sample3_detailAddress').value
+      DP4 = document.getElementById('sample3_extraAddress').value
+      
+      setTimeout(function() {
+        document.getElementById('DP').value = String(DP1) + " / " + String(DP2) + " / " + String(DP3) + " / " + String(DP4)
+      }, 100);
+
+      document.getElementById('sample3_postcode').value = ""
+      document.getElementById('sample3_address').value = ""
+      document.getElementById('sample3_detailAddress').value = ""
+      document.getElementById('sample3_extraAddress').value = ""
+    }
+    function onclickIfsame() {
+      SPV = document.getElementById('SP').value
+      setTimeout (function() {
+        document.getElementById('DP').value = SPV
+        console.log(SPV)
+      }, 100)
+    }
+  </script>
+
+  <!-- kakao map -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9ec15cee8f9a36012166f2c377d167d7"></script>
+  <script>
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+        mapOption = { 
+            center: new kakao.maps.LatLng(33.450701, 126.570667),
+            level: 3 // 지도의 확대 레벨
+        };
     
-    function codeAddress() {
-      var address = document.getElementById('sample3_address').value;
-      geocoder.geocode( { 'address': address}, function(results, status) {
-        if (status == 'OK') {
-          map.setCenter(results[0].geometry.location);
-          var marker = new google.maps.Marker({
-              map: map,
-              position: results[0].geometry.location
-          });
-        } 
-        else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
-    }
-  </script>
+    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+    
+    var startSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png', // 출발 마커이미지의 주소입니다    
+        startSize = new kakao.maps.Size(50, 45), // 출발 마커이미지의 크기입니다 
+        startOption = { 
+            offset: new kakao.maps.Point(15, 43) // 출발 마커이미지에서 마커의 좌표에 일치시킬 좌표를 설정합니다 (기본값은 이미지의 가운데 아래입니다)
+        };
+    
+    // 출발 마커 이미지를 생성합니다
+    var startImage = new kakao.maps.MarkerImage(startSrc, startSize, startOption);
+    
+    var startDragSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_drag.png', // 출발 마커의 드래그 이미지 주소입니다    
+        startDragSize = new kakao.maps.Size(50, 64), // 출발 마커의 드래그 이미지 크기입니다 
+        startDragOption = { 
+            offset: new kakao.maps.Point(15, 54) // 출발 마커의 드래그 이미지에서 마커의 좌표에 일치시킬 좌표를 설정합니다 (기본값은 이미지의 가운데 아래입니다)
+        };
+    
+    // 출발 마커의 드래그 이미지를 생성합니다
+    var startDragImage = new kakao.maps.MarkerImage(startDragSrc, startDragSize, startDragOption);
+    
+    // 출발 마커가 표시될 위치입니다 
+    var startPosition = new kakao.maps.LatLng(33.450701, 126.570667); 
+    
+    // 출발 마커를 생성합니다
+    var startMarker = new kakao.maps.Marker({
+        map: map, // 출발 마커가 지도 위에 표시되도록 설정합니다
+        position: startPosition,
+        draggable: true, // 출발 마커가 드래그 가능하도록 설정합니다
+        image: startImage // 출발 마커이미지를 설정합니다
+    });
+    
+    // 출발 마커에 dragstart 이벤트를 등록합니다
+    kakao.maps.event.addListener(startMarker, 'dragstart', function() {
+        // 출발 마커의 드래그가 시작될 때 마커 이미지를 변경합니다
+        startMarker.setImage(startDragImage);
+    });
+    
+    // 출발 마커에 dragend 이벤트를 등록합니다
+    kakao.maps.event.addListener(startMarker, 'dragend', function() {
+         // 출발 마커의 드래그가 종료될 때 마커 이미지를 원래 이미지로 변경합니다
+        startMarker.setImage(startImage);
+    });
+    
+    var arriveSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png', // 도착 마커이미지 주소입니다    
+    arriveSize = new kakao.maps.Size(50, 45), // 도착 마커이미지의 크기입니다 
+    arriveOption = { 
+        offset: new kakao.maps.Point(15, 43) // 도착 마커이미지에서 마커의 좌표에 일치시킬 좌표를 설정합니다 (기본값은 이미지의 가운데 아래입니다)
+    };
+    
+    // 도착 마커 이미지를 생성합니다
+    var arriveImage = new kakao.maps.MarkerImage(arriveSrc, arriveSize, arriveOption);
+    
+    var arriveDragSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_drag.png', // 도착 마커의 드래그 이미지 주소입니다    
+        arriveDragSize = new kakao.maps.Size(50, 64), // 도착 마커의 드래그 이미지 크기입니다 
+        arriveDragOption = { 
+            offset: new kakao.maps.Point(15, 54) // 도착 마커의 드래그 이미지에서 마커의 좌표에 일치시킬 좌표를 설정합니다 (기본값은 이미지의 가운데 아래입니다)
+        };
+     
+    // 도착 마커의 드래그 이미지를 생성합니다
+    var arriveDragImage = new kakao.maps.MarkerImage(arriveDragSrc, arriveDragSize, arriveDragOption);
+    
+    // 도착 마커가 표시될 위치입니다 
+    var arrivePosition = new kakao.maps.LatLng(33.450701, 126.572667);    
+     
+    // 도착 마커를 생성합니다 
+    var arriveMarker = new kakao.maps.Marker({  
+        map: map, // 도착 마커가 지도 위에 표시되도록 설정합니다
+        position: arrivePosition,
+        draggable: true, // 도착 마커가 드래그 가능하도록 설정합니다
+        image: arriveImage // 도착 마커이미지를 설정합니다
+    });
+    
+    // 도착 마커에 dragstart 이벤트를 등록합니다
+    kakao.maps.event.addListener(arriveMarker, 'dragstart', function() {
+        // 도착 마커의 드래그가 시작될 때 마커 이미지를 변경합니다
+        arriveMarker.setImage(arriveDragImage);
+    });
+    
+    // 도착 마커에 dragend 이벤트를 등록합니다
+    kakao.maps.event.addListener(arriveMarker, 'dragend', function() {
+         // 도착 마커의 드래그가 종료될 때 마커 이미지를 원래 이미지로 변경합니다
+        arriveMarker.setImage(arriveImage);  
+    });
+    </script>
 
     <br><br>
     <!-- =========================================================== -->
@@ -194,12 +325,21 @@
         <span class="input-group-text" id="inputGroup-sizing-default">Max length (m)</span>
         <input type="text" class="form-control" aria-label="Sizing example input" name = "Max_Length" aria-describedby="inputGroup-sizing-default">
     </div>
-    <p class="mt-5 mb-3 text-muted">defalut == 100000</p>
+    <p class="mt-5 mb-3 text-muted">min = 100, max = 20000 defalut == 1000</p>
 
     <br>
-
     <!-- =========================================================== -->
-    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group" >
+      <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off"name = "CS2" value="True">
+      <label class="btn btn-outline-primary" for="btncheck1">편의점</label>
+    
+      <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" name = "MT1" value="True">
+      <label class="btn btn-outline-primary" for="btncheck2">마트</label>
+    </div>
+    <!-- =========================================================== -->
+    <div style="text-align: center;">
+      <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+    </div>
     <br><br><br>
 
   </form>
@@ -208,5 +348,5 @@
 </body>
 </html>
 
-<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDks17rZCFjI_zz5dOQojRHWmYAZ2ZvKA8&callback=initMap"></script>
+
 

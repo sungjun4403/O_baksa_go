@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,13 +11,33 @@
 </head>
 <body>
 <div align = "middle">
-    <br><br><br><br>
+    <br><br>
     SHOW OPTIONS
     <br>
-    
-    <img src = "file:///Users/sungjun/Documents/O_baksa_go/OBSpjct/graphimage.png" alt = "" width = "500" height="500">
-    
 
+    <img src = "{% static 'graphimage.png'%}" alt = "" width = "550" height="550">
+    <br>
+    
+    {% if ifCS2 == "True" %}
+        <h4>found {{lenCS2}} CS2</h4>
+        <br>
+        {% for cs2 in CS2 %}
+            {{cs2.1}} / {{cs2.2}} / {{cs2.7}} / {{cs2.4}}m from Starting_Point / lat : {{cs2.11}}, lng : {{cs2.10}}
+            <br>
+        {% endfor %}
+    {% endif %}
+    <br>
+    
+    {% if ifMT1 == "True" %}
+        <h4>found {{lenMT1}} MT1</h4>
+        <br>
+        {% for mt1 in MT1 %}
+            {{mt1.1}} / {{mt1.2}} / {{mt1.7}} / {{mt1.4}}m from Starting_Point / lat : {{mt1.11}}, lng : {{mt1.10}}
+            <br>
+        {% endfor %}
+    {% endif %}
+
+    <br>
     <form action = "{% url 'end' %}">
         <button type="submit" class="btn btn-primary btn-lg">end</button>
     </form>
