@@ -45,6 +45,9 @@ def get_options(request):
     ifMT1 = request.POST.get('MT1')
     ifCS2 = request.POST.get('CS2')
     #0 : postcode / 1 : address / 2 : detailAddress / 3 : extraAddress
+    if Starting_Point[-1] == ')'and Starting_Point[0] == '(':
+        ADDRESS
+
     Starting_Point_list = Starting_Point.split(" / ")
     Destination_Point_list = Destination.split(" / ")
     for p in range (0, len(Starting_Point_list)-1): Starting_Point_list[p] = str(Starting_Point_list[p]).strip()
@@ -53,17 +56,7 @@ def get_options(request):
     ADDRESS = Starting_Point_list[1]        
     address = Destination_Point_list[1]       
 
-    try:  
-        if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
-            pass
-        else:
-            Max_Length = int(Max_Length)        
-
-    except:
-        return redirect('input')        #숫자가 아닐떄
     
-    if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
-        Max_Length = 5000
 
     #받을떄 좌표로 받으면 geocoding 스킵하는 로직 
     #SPL, DPL / 0 : location (lat, lng) / 1 : address / 2 : address_type
@@ -105,6 +98,17 @@ def get_options(request):
     else:
         DPL = google_geocode(str(address))
     
+    try:  
+        if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
+            pass
+        else:
+            Max_Length = int(Max_Length)        
+
+    except:
+        return redirect('input')        #숫자가 아닐떄
+    
+    if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
+        Max_Length = 5000
     
     #주변 편의점, 마트 
     if ifCS2 == "True": 
@@ -269,7 +273,6 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     print(route)
     print("===========================")
     print()
-
 
 
 def forCS1(Max_Legnth):
