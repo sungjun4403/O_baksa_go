@@ -46,7 +46,13 @@ def get_options(request):
     ifCS2 = request.POST.get('CS2')
     #0 : postcode / 1 : address / 2 : detailAddress / 3 : extraAddress
     if Starting_Point[-1] == ')'and Starting_Point[0] == '(':
-        ADDRESS
+        Starting_Point.strip()
+        Starting_Point = Starting_Point[1:-1]
+        Starting_Point = " / " + str(Starting_Point) + " / " + " / "
+    if Destination[-1] == ')'and Destination[0] == '(':
+        Destination.strip()
+        Destination = Destination[1:-1]
+        Destination = " / " + str(Destination) + " / " + " / "
 
     Starting_Point_list = Starting_Point.split(" / ")
     Destination_Point_list = Destination.split(" / ")
@@ -55,8 +61,6 @@ def get_options(request):
 
     ADDRESS = Starting_Point_list[1]        
     address = Destination_Point_list[1]       
-
-    
 
     #받을떄 좌표로 받으면 geocoding 스킵하는 로직 
     #SPL, DPL / 0 : location (lat, lng) / 1 : address / 2 : address_type
@@ -195,6 +199,22 @@ def search_MT1(SPL, DPL, ifsame, Max_Length):        #MT1, CS2,
     # 0 : address_name / 1 : category_group_code / 2 : category_group_name / 3 : category_name / 4 : distance / 5 : id / 6 : phone / 7 : place_name / 8 : place_url / 9 : road_address_name / 10 : x / 11 : y
     for i in places:
         if i.get('category_group_code') == "CS2": pass
+        elif i.get('category_group_code') == "PS3": pass
+        elif i.get('category_group_code') == "SC4": pass
+        elif i.get('category_group_code') == "AC5": pass
+        elif i.get('category_group_code') == "PK6": pass
+        elif i.get('category_group_code') == "OL7": pass
+        elif i.get('category_group_code') == "SW8": pass
+        elif i.get('category_group_code') == "BK9": pass
+        elif i.get('category_group_code') == "CT1": pass
+        elif i.get('category_group_code') == "AG2": pass
+        elif i.get('category_group_code') == "PO3": pass
+        elif i.get('category_group_code') == "AT4": pass
+        elif i.get('category_group_code') == "AD5": pass
+        elif i.get('category_group_code') == "FD6": pass
+        elif i.get('category_group_code') == "CE7": pass
+        elif i.get('category_group_code') == "HP8": pass
+        elif i.get('category_group_code') == "PM9": pass
         else:
             to_append_list = []
             to_append_list.append(i.get('address_name'))
