@@ -58,7 +58,7 @@ HTML
 
 <br/> 
 
-이 과정에서 상당한 어려움이 있었다. ~~자바스크립트를 배운적이 없다는게 일단 가장 크게 작용한 것 같다.~~ 기본적으로 카카오에서는 마커 생성 후 마커 속성 변경을 권장하지 않으려 하는 것 같았다. 드래그만 가능할 뿐 드래그 위치를 지정한다던지, 드래그 가능 여부를 변경한다던지 하는 식의 변경을 불가능해 보였다. 처음 마커 생성 시에만 속성을 건드릴 수 있도록 하는 것 같았으나 마커를 드래그하고 해당 마커를 <code>setMap(null);</code>으로 지도에서 지우고 <code>setMap(map);</code>으로 다시 생성하였을 때 드래그한 후의 위치가 적용되는것으로 보아 드래그를 통해서는 마커의 위치 속성을 변경 할 수 있는 것으로 보였다. 또 하나 문제는 인터랙티브한 마커 위치 반영을 위해 <code>setInterval</code>으로 마커를 삭제, 생성 하려고 하였는데 이때 같은 이름의 같은 속성의 객체가 무한정 생성될 거라고 생각하지 못하였다 -> 마커를 치워도 같은 마커가 무한정 생성되는 이슈가 있었다. 이러한 이슈가 있었음에도 인터랙티브하게 구현해야하는 이유가 있었다. 도로명 주소로 주소를 입력하거나 현위치를 받아 마커를 띄울 때에 정확한 위차가 아닌 곳에 마커가 떠 있을 수 있어 한번의 입력이 아닌 여러 방식으로 (도로명주소와 드래그 등의) 입력하는 케이스를 염두해두고 개발하였기 떄문에 포기 할 수 없는 기능이였다. 
+이 과정에서 상당한 어려움이 있었다. ~~자바스크립트를 배운적이 없다는게 일단 가장 크게 작용한 것 같다.~~ 기본적으로 카카오에서는 마커 생성 후 마커 속성 변경을 권장하지 않으려 하는 것 같았다. 드래그만 가능할 뿐 드래그 위치를 지정한다던지, 드래그 가능 여부를 변경한다던지 하는 식의 변경을 불가능해 보였다. 처음 마커 생성 시에만 속성을 건드릴 수 있도록 하는 것 같았으나 마커를 드래그하고 해당 마커를 <code>setMap(null);</code>으로 지도에서 지우고 <code>setMap(map);</code>으로 다시 생성하였을 때 드래그한 후의 위치가 적용되는것으로 보아 드래그를 통해서는 마커의 위치 속성을 변경 할 수 있는 것으로 보였다. 또 하나 문제는 인터랙티브한 마커 위치 반영을 위해 <code>setInterval</code>으로 마커를 삭제, 생성 하려고 하였는데 이때 같은 이름의 같은 속성의 객체가 무한정 생성될 거라고 생각하지 못하였다 -> 마커를 치워도 같은 마커가 무한정 생성되는 이슈가 있었다. 이러한 이슈가 있었음에도 인터랙티브하게 구현해야하는 이유가 있었다. 도로명 주소로 주소를 입력하거나 현위치를 받아 마커를 띄울 때에 정확한 위차가 아닌 곳에 마커가 떠 있을 수 있어 한번의 입력이 아닌 여러 방식으로 (도로명주소와 드래그 등의) 입력하는 케이스를 염두해두고 개발하였기 떄문에 포기 할 수 없는 기능이였다. 다큐멘트에 <code>marker.setPosition(lat, lng)</code>이 있었는데 못봤다...
 
 <br/>
 
@@ -69,12 +69,10 @@ HTML
 ~~~javascript
 setInterval(function () {
   if (document.getElementById('flexCheckChecked').checked) {
-    showMarkers();
     document.getElementById('SP').value = String(startMarker.getPosition());
     document.getElementById('DP').value = String(arriveMarker.getPosition());
   } 
   else {
-    hideMarkers();
     spl = document.getElementById('SP').value.split(" / ")
     console.log(jsgeocode(spl[0]))
     console.log(spl[0])
@@ -247,5 +245,37 @@ HTML
 </div>
 ~~~
 
+<br/>
+
+가장 오래 걸렸던 마커 포지션 변경에도 이런저런 이슈들이 있었다. 위의 geolocation 함수에서 리스트 형태로 반환을 해야하는데 콘솔에서는 빈 리스트로 보이고 더보기를 누르면 비어있는 것처럼 생긴 리스트 안에 값이 있는 보여졌다(typeof로 찍어보았을 떄도 array가 아닌 object로 나왔다. object.values도 안되었다). 문제는 인덱싱이 안됐다는 것이였는데 결국은 빈 리스트 선언 -> 값 푸시 -> 리스트 반환 이였던 과정을 <code>rslt = [lat, lng];</code> 식으로 바꾸었더니 정상적으로 작동하였다. 그리고 현위치를 받고 그 위치를 중심으로 지도를 생성하였기 떄문에 지도 생성 변수와 로직을 전부 함수로 감쌌다. 그리고 그 과정에서 변수가 함수 안에 들어가있어서 외부에서 함수 안의 함수(onclick에서 initMap안의 변수로 마커 설정하는 함수)를 호출할 수 없어 jquery를 조금 사용했다 다음은 그 함수이다. 
+
+<br/>
+
+~~~javascript
+$('#radioSP').click(function () {
+  setTimeout(function(){
+    var sp = [];
+    sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
+    console.log(sp[0])
+    console.log(sp[1])
+    // startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
+    setTimeout(function() {
+      var sp = [];
+      sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
+      console.log(sp[0])
+      console.log(sp[1])
+      startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
+    }, 500)
+  }, 500)
+})
+~~~
+
+<br/>
+
+불필요한 부분이 꽤 있지만 괜히 지웠다가 문제 생길까봐 그냥 놔두었다. setTimeout 500은 되는데 200은 현위치로 가버린다(또 이유는 모른다). setTimeout 500, setTimeout 500은 되고 setTimeout 1000은 안된다. 안쓰는 값이여도 일단 한번 불러와줘야 하는 것 같았다. 
+
+<br/>
+
+최종적으로 도로명주소로 마커 위치를 변경하는 로직에서 정말 신기한 이슈가 있었다. send to SP, DP를 누르면 Starting Point의 밸류를 지오코딩해서 마커 위치를 변경하는 식이였는데 밸류를 받아오고 split후 인덱싱까지 정상적으로 되었으나 마커가 현위치 기준 오른 위에 있었다가 현위치로 이동했다. 정말 신기한 것은 두번째 버튼 클릭시에는 정상적인 위치로 간다는 것이다. 이해가 전혀 안되는 부분은 1. 현위치는 지도 로딩 떄 이후로 받아온 적이 없는데 마커가 현위치로 이동하는 것 2. 지도 로딩시에 디폴트 마커 위치는 현위치lat+0.001, 현위치lng+0.001인데 어떻게 현위치 오른 위가 아니라 딱 현위치로 오는지 3. 왜 두번째에는 되는지. 추측컨대 1. 빈 값을 받아와서 지도 중심으로 마커 위치가 설정됐다 2. 지도 로딩 떄 불러온 현위치가 들어가버렸다 (어떻게?) 인거 같은데 모르겠다. 
 
 
