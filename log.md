@@ -1,7 +1,3 @@
-시작하기에 앞서 자바스크립트를 배운적이 없으며 파이썬과 동시에 개발하고 있기에 파이썬 문법과 자바스크립트에는 적절치 않는 로직이 잔뜩 섞여있음을 알린다.
-
-<br/>
-
 https://apis.map.kakao.com/web/sample/addDraggableMarkerDragEvent/
 
 <br/>
