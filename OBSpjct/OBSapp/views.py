@@ -112,17 +112,17 @@ def get_options(request):
         return redirect('input')        #숫자가 아닐떄
     
     if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
-        Max_Length = 5000
+        Max_Length = 1000
     
     #주변 편의점, 마트 
     if ifCS2 == "True": 
-        CS2 = search_CS2(SPL, DPL, ifsame, Max_Length)
+        CS2 = forCS2(SPL, DPL, ifsame, Max_Length)
         CS2L = getlst(CS2)
     else: 
         CS2 = []
         CS2L = []
     if ifMT1 == "True": 
-        MT1 = search_MT1(SPL, DPL, ifsame, Max_Length)
+        MT1 = forMT1(SPL, DPL, ifsame, Max_Length)
         MT1L = getlst(MT1)
     else: 
         MT1 = []
@@ -134,7 +134,7 @@ def get_options(request):
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
     print("**********************************************************************************************************************************************************************")
-    return render(request, 'show_options.html', {'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2}) 
+    return render(request, 'show_options.html', {'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL}) 
 
 
 def end(request):
@@ -295,28 +295,21 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     print()
 
 
-def forCS1(Max_Legnth):
+def forCS2(SPL, DPL, ifsame, Max_Length):
     rslt = []
-    prcs = []
-    for p in range (0, Max_Legnth, 100):
-        for src in search_CS2:
-            prcs.append(src)
-    for q in range(0, len(prcs), 1):
-        if prcs[q] in rslt:
-            pass
-        else: rslt.append(prcs[q])
-    return rslt 
+    for p in range (0, int(Max_Length)+100, 100):
+        src = search_CS2(SPL, DPL, ifsame,p)
+        for q in range(0, len(src), 1):
+            if src[q] not in rslt:
+                rslt.append(src[q])
+    return rslt
 
 
-def forMT1(Max_Length):
+def forMT1(SPL, DPL, ifsame, Max_Length):
     rslt = []
-    prcs = []
-    for p in range (0, Max_Length, 100):
-        for src in search_MT1:
-            prcs.append(src)
-    for q in range (0, len(prcs), 1):
-        if prcs[q] in rslt:
-            pass
-        else: rslt.append(prcs[q])
-    print(rslt)
+    for p in range (0, int(Max_Length)+100, 100):
+        src = search_MT1(SPL, DPL, ifsame, p)
+        for q in range(0, len(src), 1):
+            if src[q] not in rslt:
+                rslt.append(src[q])
     return rslt
