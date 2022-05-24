@@ -283,6 +283,12 @@ $('#radioSP').click(function () {
 위에서 마커로 주소 입력 로직을 <code>kakao.maps.event.addListener(map, 'dragend', function() {});</code>으로 구현하였으나 드래그를 하고 드래그가 끝나야만 주소가 입력되는 탓에 체크되지 않은상태에서 이동한 마커의 값을 넣으려면 체크 후 다시 움직여야 했다. 결국 다시 setInterval로 구현하였다
 
 <br/>
+
+이외의 자잘한 html, js 세팅이 있었다. Starting_Point, Destination 인풋 태그는 <code>readonly</code>와 <code>required</code>속성을 지정하였다. (파이썬 로직 내에서 예상치 못한 포맷으로 인한 에러 방지, 어차피 send to SP,DP, 마커로 주소입력 등으로 함수를 통해서만 값 입력. Max_Length 인풋 태그에는 <code>type="number" step = "100"</code>으로 정수값만 입력받도록 하였다. 
+
 <br/>
+
+Staring Point 기준으로 Max_Length (m) 내에 있는 편의점, 마트를 불러오는 로직인 search_MT1, search_CS2에서 범위 내 편의점 마트를 불러올떄 누락되는 편의점이 있어 함수를 추가적으로 구현하였다. (Max_Length == 900m 정도면 100m~400m는 제외되고 700m~900m 범위 내만 불러옴, 이유는 X, 다른 사람도 결국 for문 돌림)
+
 <br/>
 
