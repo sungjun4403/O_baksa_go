@@ -288,17 +288,7 @@ $('#radioSP').click(function () {
 
 Staring Point 기준으로 Max_Length (m) 내에 있는 편의점, 마트를 불러오는 로직인 search_MT1, search_CS2에서 범위 내 편의점 마트를 불러올떄 누락되는 편의점이 있어 함수를 추가적으로 구현하였다. (Max_Length == 900m 정도면 100m~400m는 제외되고 700m~900m 범위 내만 불러옴, 이유는 X, 다른 사람도 결국 for문 돌림)
 
-<br/>
 
-&#x27;경기 성남시 분당구 서현동 276-1&#x27;, &#x27;CS2&#x27;, &#x27;편의점&#x27;, &#x27;가정,생활 &gt; 편의점 &gt; GS25&#x27;, &#x27;256&#x27;, &#x27;12314871&#x27;, &#x27;&#x27;, &#x27;GS25 분당시그마점&#x27;, &#x27;http://place.map.kakao.com/12314871&#x27;
-
-<br/>
-
-~~~javascript
-for (p = 0; p < parseInt("{{lenCS2}}"); p++) {
-        console.log("{{CS2}}"[p])
-}
-~~~
 
 <br/>
 
@@ -321,7 +311,17 @@ for (p = 0; p < parseInt("{{lenCS2}}"); p++) {
 가장 위 이미지는 osmnx를 사용해 지도를 그래프로 그린 것이다. OSMnx와 연관된 라이브러리의 관계는 다음과 같다. OSMnx 메서드로 입력한 주소는 folium 또는 OSM을 통해 받아온 지도를 node와 edge를 가지는 networkX 라이브러리의 MultiDiGraph 형태의 그래프로 반환한다. 생성된 networkX형태의 MultiDiGraph는 matplotlib로 그려지는 것이기 때문에 html 상에 그래프를 띄우려면 matplotlib의 메서드를 사용해야 하는데 matplotlib에는 plotly 라이브러리와 같이 html로 div 형태로 반환시켜주는 메서드가 없다(적어도 내가 찾기론). 결국 이미지 형태로 로컬에 저장해서 로컬 이미지를 바로 띄워주어야 하는데 문제는 django-html 상에서 보안상의 이유로 로컬 파일 접근이 불가능하다는 것이다. 결국 생각해낸 방법이 1. 로컬 이미지를 수시로 DB에 업로드 2. 로컬 이미지를 저장 후 바로 링크화 시켜서 html에 링크로 표시 3. static 파일에 저장할 떄마다 자동으로 collectstatic하여 html상에서 static파일로 접근하여 보여주는 방법 등이다. 1번은 장고 공식 문서에서 보안상의 이유로 권장하지 않는 탓에 불가능했고 2번은 이미지를 링크화하는 마땅한 방법이 없어 포기해야 했다 (장고 라이브러리에서 file to uri가 가능하나 file///:user/document/~ 식의 링크가 아닌 filepath를 것 밖에 없었다). 의외로 3번이 가장 쉬웠는데 <code>os.system("python manage.py collectstatic --no-input")</code> 만으로도 가능했다. <code>--no-input</code>은 collectstatic시에 파일 덮어쓰기 여부와 위치를 최종확인하는 과정에서 묻는 yes no를 스킵하겠다는 내용이다. 매번 사진을 덮어씌우고 수시로 collectstatic을 하는게 비효율적이고 그닥 맘에 안들긴 하다. 
 #### ~~그래도 OSMnx 그래프 웹 상에 띄운 것은 세계최초 일듯 싶다 (검색해도 절대 안나옴 ㅋㅋ)~~
 
+<br/>
 
+&#x27;경기 성남시 분당구 서현동 276-1&#x27;, &#x27;CS2&#x27;, &#x27;편의점&#x27;, &#x27;가정,생활 &gt; 편의점 &gt; GS25&#x27;, &#x27;256&#x27;, &#x27;12314871&#x27;, &#x27;&#x27;, &#x27;GS25 분당시그마점&#x27;, &#x27;http://place.map.kakao.com/12314871&#x27;
+
+<br/>
+
+~~~javascript
+for (p = 0; p < parseInt("{{lenCS2}}"); p++) {
+        console.log("{{CS2}}"[p])
+}
+~~~
 
 
 
