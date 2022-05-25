@@ -288,3 +288,14 @@ Staring Point 기준으로 Max_Length (m) 내에 있는 편의점, 마트를 불
 
 <br/>
 
+&#x27;경기 성남시 분당구 서현동 276-1&#x27;, &#x27;CS2&#x27;, &#x27;편의점&#x27;, &#x27;가정,생활 &gt; 편의점 &gt; GS25&#x27;, &#x27;256&#x27;, &#x27;12314871&#x27;, &#x27;&#x27;, &#x27;GS25 분당시그마점&#x27;, &#x27;http://place.map.kakao.com/12314871&#x27;
+
+<br/>
+
+~~~javascript
+for (p = 0; p < parseInt("{{lenCS2}}"); p++) {
+        console.log("{{CS2}}"[p])
+}
+~~~
+
+
