@@ -129,12 +129,44 @@ def get_options(request):
         MT1L = []
     print(SPL)
     print(DPL)
-    
+    print(CS2)
+
     get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L)
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
+    print(CS2)
+    CS2str0 = lstTostr(CS2, 0)
+    CS2str1 = lstTostr(CS2, 1)
+    CS2str2 = lstTostr(CS2, 2)
+    CS2str3 = lstTostr(CS2, 3)
+    CS2str4 = lstTostr(CS2, 4)
+    CS2str5 = lstTostr(CS2, 5)
+    CS2str6 = lstTostr(CS2, 6)
+    CS2str7 = lstTostr(CS2, 7)
+    CS2str8 = lstTostr(CS2, 8)
+    CS2str9 = lstTostr(CS2, 9)
+    CS2str10 = lstTostr(CS2, 10)
+    CS2str11 = lstTostr(CS2, 11)
+    
+    MT1str0 = lstTostr(MT1, 0)
+    MT1str1 = lstTostr(MT1, 1)
+    MT1str2 = lstTostr(MT1, 2)
+    MT1str3 = lstTostr(MT1, 3)
+    MT1str4 = lstTostr(MT1, 4)
+    MT1str5 = lstTostr(MT1, 5)
+    MT1str6 = lstTostr(MT1, 6)
+    MT1str7 = lstTostr(MT1, 7)
+    MT1str8 = lstTostr(MT1, 8)
+    MT1str9 = lstTostr(MT1, 9)
+    MT1str10 = lstTostr(MT1, 10)
+    MT1str11 = lstTostr(MT1, 11)
+
     print("**********************************************************************************************************************************************************************")
-    return render(request, 'show_options.html', {'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL}) 
+    return render(request, 'show_options.html', {
+        'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL, 
+        'CS2str0' : CS2str0, 'CS2str1':CS2str1, 'CS2str2':CS2str2, 'CS2str3': CS2str3, 'CS2str4':CS2str4, 'CS2str5':CS2str5, 'CS2str6':CS2str6, 'CS2str7':CS2str7, 'CS2str8':CS2str8, 'CS2str9':CS2str9, 'CS2str10':CS2str10, 'CS2str11': CS2str11,
+        'MT1str0':MT1str0, 'MT1str1':MT1str1, 'MT1str2':MT1str2, 'MT1str3':MT1str3, 'MT1str4':MT1str4, 'MT1str5':MT1str5, 'MT1str6':MT1str6, 'MT1str7':MT1str7, 'MT1str8':MT1str8, 'MT1str9':MT1str9, 'MT1str10':MT1str10, 'MT1str11':MT1str11
+        }) 
 
 
 def end(request):
@@ -243,6 +275,15 @@ def getlst (places):
         lst.append(to_append_lst)
     
     return lst
+
+def lstTostr(lst, indx):
+    rslt = []
+    prcs = []
+    for i in range(0, len(lst), 1):
+         prcs.append(lst[i][indx])
+    rslt = str(prcs)
+    rslt = rslt[1:-1]
+    return rslt
 
 
 def google_geocode (got_place):
