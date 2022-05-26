@@ -324,6 +324,76 @@ for (p = 0; p < parseInt("{{lenCS2}}"); p++) {
 }
 ~~~
 
+<br/>
 
+아래는 show_options.html에서 편의점과 마트 마커 표시와 한 화면에 모든 마커가 보이도록 하는 메서드이다
+
+<br/>
+
+~~~javascript
+for (x = 0; x < CS2lst10.length; x++) {
+    var CS2position = new kakao.maps.LatLng(parseFloat(CS2lst11[x]), parseFloat(CS2lst10[x]));
+    var CS2marker = new kakao.maps.Marker({
+        map:map,
+        position:CS2position,
+        draggable:false,
+        // image:
+    })
+    CS2markers.push(CS2marker);
+    markers.push(CS2marker);
+}
+
+for (y = 0; y < MT1lst10.length; y++) {
+    var MT1position = new kakao.maps.LatLng(parseFloat(MT1lst11[y]), parseFloat(MT1lst10[y]));
+    var MT1marker = new kakao.maps.Marker({
+        map:map,
+        position:MT1position,
+        draggable:false,
+        // image:
+    })
+    MT1markers.push(MT1marker); 
+    markers.push(MT1marker);
+}
+
+var bounds = new kakao.maps.LatLngBounds();
+
+function setMarkersBound() {
+    for (i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+    }
+    map.setBounds(bounds);
+}
+
+function showCS2() {
+    for (i = 0; i < CS2markers.length; i++) {
+        CS2markers[i].setMap(map)
+    }
+}
+
+function hideCS2 () {
+    for (i = 0; i < CS2markers.length; i++) {
+        CS2markers[i].setMap(null)
+    }
+}
+
+function showMT1 () {
+    for (i = 0; i < MT1markers.length; i++) {
+        MT1markers[i].setMap(map)
+    }
+}
+
+function hideMT1 () {
+    for (i = 0; i < MT1markers.length; i++) {
+        MT1markers[i].setMap(null)
+    }
+}
+~~~
+
+<br/>
+
+<code>bounds.extend(markers[i].getPosition());</code>가 포인트다. 굳이 문제를 뽑자면 setBounds하는 과정에서 확대, 축소가 과하다는 것인데 빈 bound 객체에 <code>kakao.maps.LatLngBounds(sw, ne)</code>를 통해 보여주려는 맵의 남서, 북동 좌표를 지정하면 되지만 맵의 비율을 좌표에 반영하는 과정에서 매우 큰 어려움이 있을것 같아 넘겼다. 
+
+
+<br/>
 
 
