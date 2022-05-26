@@ -393,7 +393,6 @@ function hideMT1 () {
 
 <code>bounds.extend(markers[i].getPosition());</code>가 포인트다. 굳이 문제를 뽑자면 setBounds하는 과정에서 확대, 축소가 과하다는 것인데 빈 bound 객체에 <code>kakao.maps.LatLngBounds(sw, ne)</code>를 통해 보여주려는 맵의 남서, 북동 좌표를 지정하면 되지만 맵의 비율을 좌표에 반영하는 과정에서 매우 큰 어려움이 있을것 같아 넘겼다. 
 
-
 <br/>
 
 
