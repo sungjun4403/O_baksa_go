@@ -378,42 +378,53 @@ function initMap(initloc) {
   
   setInterval(function(){
     if (document.getElementById('flexCheckChecked').checked) {
+      startMarker.setDraggable(true);
+      arriveMarker.setDraggable(true);
       document.getElementById('DP').value = String(arriveMarker.getPosition());
       document.getElementById('SP').value = String(startMarker.getPosition());
     }
     else{}
   }, 500)
 
+  var markers = [];
+  markers.push(startMarker);
+  markers.push(arriveMarker);
+  var bounds = new kakao.maps.LatLngBounds();
+  function setMarkersBound() {
+    for (i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+    }
+    map.setBounds(bounds);
+  }
+
   $('#radioSP').click(function () {
     setTimeout(function(){
+      startMarker.setDraggable(false);
       var sp = [];
       sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
       console.log(sp[0])
       console.log(sp[1])
-      // startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
-      setTimeout(function() {
-        var sp = [];
-        sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
-        console.log(sp[0])
-        console.log(sp[1])
-        startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
+      startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
+      setTimeout(function(){
+        setMarkersBound();
       }, 500)
-    }, 500)
+      
+    }, 1000)
   })
 
   $('#radioDP').click(function () {
     setTimeout(function(){
+      arriveMarker.setDraggable(false);
       var dp = [];
       dp = jsgeocode(document.getElementById('DP').value.split(" / ")[1]);
-      // startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
-      setTimeout(function() {
-        var dp = [];
-        dp = jsgeocode(document.getElementById('DP').value.split(" / ")[1]);
-        console.log(dp[0])
-        console.log(dp[1])
-        arriveMarker.setPosition(new kakao.maps.LatLng(dp[0], dp[1]));
+      console.log(dp[0])
+      console.log(dp[1])
+      arriveMarker.setPosition(new kakao.maps.LatLng(dp[0], dp[1]));
+      setTimeout(function(){
+        setMarkersBound();
       }, 500)
-    }, 500)
+      
+    }, 1000)
   })
 }
 
@@ -421,7 +432,7 @@ function initMap(initloc) {
 <!-- =========================================================== -->
 <div class="input-group mb-3">
   <span class="input-group-text" id="inputGroup-sizing-default">Max length (m)</span>
-  <input type="number" step = "100" class="form-control" aria-label="Sizing example input" name="Max_Length" aria-describedby="inputGroup-sizing-default">
+  <input type="number" min = "100" max="20000" step = "100" class="form-control" aria-label="Sizing example input" name="Max_Length" aria-describedby="inputGroup-sizing-default">
 </div>
 <p class="mt-5 mb-3 text-muted">min = 100, max = 20000 defalut == 1000</p>
 <br>

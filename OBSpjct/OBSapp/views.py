@@ -1,7 +1,9 @@
 from distutils.debug import DEBUG
 from email.mime import base
 from importlib.resources import path
+from operator import indexOf
 import re
+from turtle import distance
 from django.shortcuts import redirect, render
 from django.conf import settings
 from .models import *
@@ -29,7 +31,8 @@ import json
 import datetime
 
 matplotlib.use('Agg')
-
+ox.config(use_cache = True, log_console = True)
+ox.__version__
 # Create your views here.
 def home (request):
     return render(request, 'home.html')
@@ -127,14 +130,11 @@ def get_options(request):
     else: 
         MT1 = []
         MT1L = []
-    print(SPL)
-    print(DPL)
-    print(CS2)
 
     get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L)
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
-    print(CS2)
+    
     CS2str0 = lstTostr(CS2, 0)
     CS2str1 = lstTostr(CS2, 1)
     CS2str2 = lstTostr(CS2, 2)
@@ -270,11 +270,12 @@ def getlst (places):
     lst = []
     for place in places:
         to_append_lst = [] 
-        to_append_lst.append(place[10])
         to_append_lst.append(place[11])
+        to_append_lst.append(place[10])
         lst.append(to_append_lst)
     
     return lst
+
 
 def lstTostr(lst, indx):
     rslt = []
@@ -300,14 +301,9 @@ def google_geocode (got_place):
 
 
 def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
-    
-    sys.path.append(os.path.realpath('..'))
     start = time.time() 
-    
-    ox.config(use_cache = True, log_console = True)
-    ox.__version__
 
-    G = ox.graph_from_address (SPL[0], network_type = 'drive_service')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
+    G = ox.graph_from_address (SPL[0], network_type = 'walk')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
 
     spl = SPL[0].split(", ")
     spllat = float(str(spl[0]).strip())
@@ -319,19 +315,48 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     dpllng = float(str(dpl[1]).strip())
     dstn = ox.nearest_nodes(G, dpllng, dpllat)
 
-    route = ox.shortest_path(G, orgn, dstn, weight = 'length')
+    if len(CS2L) == 0:
+        CS2L = [[]]
+        CS2L[0].append(spllat)
+        CS2L[0].append(spllng)
+    if len(MT1L) == 0:
+        MT1L = [[]]
+        MT1L[0].append(dpllat)
+        MT1L[0].append(dpllng)
 
-    ox.plot_graph_route(G, route, orig_dest_size=1, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 0)
+    routes = []
+    route = ox.shortest_path(G, orgn, dstn, weight = 'length')
+    routes.append(route)
+
+    length = nx.shortest_path_length(G=G, source=orgn, target=dstn, weight='length')
+
+    gotlst = getNodelst(G, CS2L, MT1L)      #0 : CS2_nodes / 1 : MT1_nodes
+    CS2_nodes = gotlst[0]
+    MT1_nodes = gotlst[1]
+    DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length)
+    
+
+
+    if len(routes) == 1:
+        ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)    
+        graph_type = "route"
+    elif len(route) == 0:
+        ox.plot_graph(G, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", node_size = 8)    
+        graph_type = "not a route"
+    else:
+        ox.plot_graph_routes(G, routes, orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+        graph_type = "routes"
+    
 
     end = time.time()       #프로세스 소요 시간 
     process_time = round(end - start, 4)
     
+    
+
     print()
     print("===========================")
     print(str(process_time) + " sec")
-    print(orgn)
-    print(dstn)
-    print(route)
+    print(graph_type)
     print("===========================")
     print()
 
@@ -354,3 +379,58 @@ def forMT1(SPL, DPL, ifsame, Max_Length):
             if src[q] not in rslt:
                 rslt.append(src[q])
     return rslt
+
+
+def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length):
+    distance_from_SP = []
+    routes = []
+    total_distance = []     #routes와 1대1 대응 
+    rslt = []       # 0 : shortest / 1 : many / 2 : neutral
+    smlst = []
+
+    #SPL부터 모든 편의점까지 거리 append(직선거리X, walk 실거리)
+    for i in range(0, len(CS2_nodes), 1):
+        distance_from_SP.append(nx.shortest_path_length(G=G, source=orgn, target=CS2_nodes[i], weight='length'))
+    
+    #indefOf(smallest in distance_from_SP)하기 위한 for문 
+    for i in range(0, len(CS2_nodes), 1):
+        if distance_from_SP[i] < smlst:     #작으면 대체 
+            smlst = distance_from_SP[i]
+    print(smlst)
+
+    for i in range(0, len(CS2_nodes), 1):     #factorial 1단계 
+        distance_from_SP.indexOf(smlst)
+        
+        
+
+    return
+
+
+def BFSsearch(G, CS2s, MT1s, orgn, dstn, Max_Length):
+
+    return
+
+
+def getNodelst(G, CS2L, MT1L):      #get nearest_nodes 
+    rslt = []
+    cs2nodes = []
+    mt1nodes = [] 
+    cs2lat = []
+    cs2lng = []
+    mt1lng = []
+    mt1lat = []
+
+    for p in range(0, len(CS2L), 1):
+        cs2lat.append(float(CS2L[p][0]))
+        cs2lng.append(float(CS2L[p][1]))
+    cs2nodes = ox.nearest_nodes(G, cs2lng, cs2lat)
+    
+    for q in range(0, len(MT1L), 1):
+        mt1lat.append(float(CS2L[q][0]))
+        mt1lng.append(float(CS2L[q][1]))
+        mt1nodes.append(ox.nearest_nodes(G, mt1lng, mt1lat))
+    mt1nodes = ox.nearest_nodes(G, mt1lng, mt1lat)
+
+    rslt.append(cs2nodes)
+    rslt.append(mt1nodes)
+    return rslt 

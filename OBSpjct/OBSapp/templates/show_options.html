@@ -2,7 +2,6 @@
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9ec15cee8f9a36012166f2c377d167d7"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -247,9 +246,16 @@
             draggable:false,
             // image:
         })
-        CS2markers.push(CS2marker);
+
+        if (isNaN(Object.values(CS2position)[0])) {}        //position이 NaN이면 마커 리스트에 푸시 X, 안하면 바운드가 꺠짐 
+        else {
+            CS2markers.push(CS2marker);
+            markers.push(CS2marker);
+        }
+        
     }
 
+    var MT1overlays = [];
     for (y = 0; y < MT1lst10.length; y++) {
         var MT1position = new kakao.maps.LatLng(parseFloat(MT1lst11[y]), parseFloat(MT1lst10[y]));
         var MT1marker = new kakao.maps.Marker({
@@ -258,7 +264,75 @@
             draggable:false,
             // image:
         })
-        MT1markers.push(MT1marker); 
+
+        //대표번호 있으면
+        if (MT1lst6[y]) {
+            var content = '<div class="wrap">' + 
+            '    <div class="info">' + 
+            '        <div class="title">' + 
+                        MT1lst7[y] + 
+            '            <div class="close" id="ovly" onclick = "closeOverlay(' + y + ');" title="닫기"></div>' + 
+            '        </div>' + 
+            '        <div class="body">' + 
+            '            <div class="desc">' + 
+            '                <div class="ellipsis">' + MT1lst9[y] + '</div>' + 
+            '                <div class="jibun ellipsis">(지번) ' + MT1lst0[y] + '</div>' + 
+            '                <div class="ellipsis">' + MT1lst6[y] + ' 대표번호</div>' +
+            '                <div><a href=' + MT1lst8[y] + ' ' +  'target="_blank" class="link">홈페이지</a></div>' + 
+            '            </div>' + 
+            '        </div>' + 
+            '    </div>' +    
+            '</div>';
+        }
+
+        //대표번호 없으면
+        else {
+            var content = '<div class="wrap">' + 
+            '    <div class="info">' + 
+            '        <div class="title">' + 
+                        MT1lst7[y] + 
+            '            <div class="close" id="ovly" onclick = "closeOverlay(' + y + ');" title="닫기"></div>' + 
+            '        </div>' + 
+            '        <div class="body">' + 
+            '            <div class="desc">' + 
+            '                <div class="ellipsis">' + MT1lst9[y] + '</div>' + 
+            '                <div class="jibun ellipsis">(지번) ' + MT1lst0[y] + '</div>' + 
+            '                <div><a href=' + MT1lst8[y] + ' ' +  'target="_blank" class="link">홈페이지</a></div>' + 
+            '            </div>' + 
+            '        </div>' + 
+            '    </div>' +    
+            '</div>';
+        }
+        
+        // 마커 위에 커스텀오버레이를 표시합니다
+        // 마커를 중심으로 커스텀 오버레이를 표시하기위해 CSS를 이용해 위치를 설정했습니다
+        var MT1overlay = new kakao.maps.CustomOverlay({
+            content: content,
+            position: MT1marker.getPosition(),       
+            map: map,
+        });   
+           
+
+        MT1overlays.push(MT1overlay);
+        // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+        
+        //없는 포지션 푸시해서 setBound하면 지도 꺠져서
+        if (isNaN(Object.values(MT1position)[0])){}
+        else {
+            markers.push(MT1marker);    
+            MT1markers.push(MT1marker); 
+        }
+    }    
+    
+    for (q = 0; q < MT1markers.length; q++) {
+        kakao.maps.event.addListener(MT1markers[q], 'click', function() {
+            MT1overlays[q].setMap(map);
+        });
+    }
+
+    // // 커스텀 오버레이를 닫기 위해 호출되는 함수입니다 
+    function closeOverlay(y){
+        MT1overlays[y].setMap(null);
     }
 
     var bounds = new kakao.maps.LatLngBounds();
@@ -291,6 +365,9 @@
     function hideMT1 () {
         for (i = 0; i < MT1markers.length; i++) {
             MT1markers[i].setMap(null)
+        }
+        for (p = 0; p < MT1overlays.length; p++) {
+            MT1overlays[p].setMap(null)
         }
     }
 
