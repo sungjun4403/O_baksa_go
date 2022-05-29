@@ -237,15 +237,82 @@
     markers.push(arriveMarker);
     var CS2markers = [];
     var MT1markers = [];
+    var CS2overlays = [];
+    var MT1overlays = [];
     
+    var CS2imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_category.png'; // 마커 이미지 url, 스프라이트 이미지를 씁니다
+    var CS2imageSize = new kakao.maps.Size(27, 28);  // 마커 이미지의 크기
+    var CS2imgOptions =  {
+            spriteSize : new kakao.maps.Size(72, 208), // 스프라이트 이미지의 크기
+            spriteOrigin : new kakao.maps.Point(46, (5*36)), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+            offset: new kakao.maps.Point(11, 28) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+        };
+    var CS2markerImage = new kakao.maps.MarkerImage(CS2imageSrc, CS2imageSize, CS2imgOptions)
+
+    var MT1imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_category.png'; // 마커 이미지 url, 스프라이트 이미지를 씁니다
+    var MT1imageSize = new kakao.maps.Size(27, 28);  // 마커 이미지의 크기
+    var MT1imgOptions =  {
+            spriteSize : new kakao.maps.Size(72, 208), // 스프라이트 이미지의 크기
+            spriteOrigin : new kakao.maps.Point(46, (1*36)), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+            offset: new kakao.maps.Point(11, 28) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+        };
+    var MT1markerImage = new kakao.maps.MarkerImage(MT1imageSrc, MT1imageSize, MT1imgOptions)
+
     for (x = 0; x < CS2lst10.length; x++) {
         var CS2position = new kakao.maps.LatLng(parseFloat(CS2lst11[x]), parseFloat(CS2lst10[x]));
+        
         var CS2marker = new kakao.maps.Marker({
             map:map,
             position:CS2position,
             draggable:false,
-            // image:
+            image: CS2markerImage
         })
+
+        if (CS2lst6[x]) {
+            var content = '<div class="wrap">' + 
+            '    <div class="info">' + 
+            '        <div class="title">' + 
+                        CS2lst7[x] + 
+            '            <div class="close" id="ovly" onclick = "closeCS2Overlay(' + x + ');" title="닫기"></div>' + 
+            '        </div>' + 
+            '        <div class="body">' + 
+            '            <div class="desc">' + 
+            '                <div class="ellipsis">' + CS2lst9[x] + '</div>' + 
+            '                <div class="jibun ellipsis">(지번) ' + CS2lst0[x] + '</div>' + 
+            '                <div class="ellipsis">' + CS2lst6[x] + ' 대표번호</div>' +
+            '                <div><a href=' + CS2lst8[x] + ' ' +  'target="_blank" class="link">홈페이지</a></div>' + 
+            '            </div>' + 
+            '        </div>' + 
+            '    </div>' +    
+            '</div>';
+        }
+
+        //대표번호 없으면
+        else {
+            var content = '<div class="wrap">' + 
+            '    <div class="info">' + 
+            '        <div class="title">' + 
+                        CS2lst7[x] + 
+            '            <div class="close" id="ovly" onclick = "closeCS2Overlay(' + x + ');" title="닫기"></div>' + 
+            '        </div>' + 
+            '        <div class="body">' + 
+            '            <div class="desc">' + 
+            '                <div class="ellipsis">' + CS2lst9[x] + '</div>' + 
+            '                <div class="jibun ellipsis">(지번) ' + CS2lst0[x] + '</div>' + 
+            '                <div><a href=' + CS2lst8[x] + ' ' +  'target="_blank" class="link">홈페이지</a></div>' + 
+            '            </div>' + 
+            '        </div>' + 
+            '    </div>' +    
+            '</div>';
+        }
+        
+        var CS2overlay = new kakao.maps.CustomOverlay({
+            content: content,
+            position: CS2marker.getPosition(),       
+            map: map,
+        });   
+
+        CS2overlays.push(CS2overlay);
 
         if (isNaN(Object.values(CS2position)[0])) {}        //position이 NaN이면 마커 리스트에 푸시 X, 안하면 바운드가 꺠짐 
         else {
@@ -254,15 +321,14 @@
         }
         
     }
-
-    var MT1overlays = [];
+    
     for (y = 0; y < MT1lst10.length; y++) {
         var MT1position = new kakao.maps.LatLng(parseFloat(MT1lst11[y]), parseFloat(MT1lst10[y]));
         var MT1marker = new kakao.maps.Marker({
             map:map,
             position:MT1position,
             draggable:false,
-            // image:
+            image: MT1markerImage
         })
 
         //대표번호 있으면
@@ -271,7 +337,7 @@
             '    <div class="info">' + 
             '        <div class="title">' + 
                         MT1lst7[y] + 
-            '            <div class="close" id="ovly" onclick = "closeOverlay(' + y + ');" title="닫기"></div>' + 
+            '            <div class="close" id="ovly" onclick = "closeMT1Overlay(' + y + ');" title="닫기"></div>' + 
             '        </div>' + 
             '        <div class="body">' + 
             '            <div class="desc">' + 
@@ -291,7 +357,7 @@
             '    <div class="info">' + 
             '        <div class="title">' + 
                         MT1lst7[y] + 
-            '            <div class="close" id="ovly" onclick = "closeOverlay(' + y + ');" title="닫기"></div>' + 
+            '            <div class="close" id="ovly" onclick = "closeMT1Overlay(' + y + ');" title="닫기"></div>' + 
             '        </div>' + 
             '        <div class="body">' + 
             '            <div class="desc">' + 
@@ -324,15 +390,13 @@
         }
     }    
     
-    for (q = 0; q < MT1markers.length; q++) {
-        kakao.maps.event.addListener(MT1markers[q], 'click', function() {
-            MT1overlays[q].setMap(map);
-        });
-    }
 
     // // 커스텀 오버레이를 닫기 위해 호출되는 함수입니다 
-    function closeOverlay(y){
+    function closeMT1Overlay(y){
         MT1overlays[y].setMap(null);
+    }
+    function closeCS2Overlay(y){
+        CS2overlays[y].setMap(null);
     }
 
     var bounds = new kakao.maps.LatLngBounds();
@@ -346,28 +410,31 @@
 
     function showCS2() {
         for (i = 0; i < CS2markers.length; i++) {
-            CS2markers[i].setMap(map)
+            CS2markers[i].setMap(map);
         }
     }
 
     function hideCS2 () {
         for (i = 0; i < CS2markers.length; i++) {
-            CS2markers[i].setMap(null)
+            CS2markers[i].setMap(null);
+        }
+        for (p = 0; p < CS2overlays.length; p++) {
+            CS2overlays[p].setMap(null);
         }
     }
 
     function showMT1 () {
         for (i = 0; i < MT1markers.length; i++) {
-            MT1markers[i].setMap(map)
+            MT1markers[i].setMap(map);
         }
     }
 
     function hideMT1 () {
         for (i = 0; i < MT1markers.length; i++) {
-            MT1markers[i].setMap(null)
+            MT1markers[i].setMap(null);
         }
         for (p = 0; p < MT1overlays.length; p++) {
-            MT1overlays[p].setMap(null)
+            MT1overlays[p].setMap(null);
         }
     }
 
