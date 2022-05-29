@@ -338,17 +338,17 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     CS2_nodes = gotlst[0]
     MT1_nodes = gotlst[1]
     DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length)
-    
 
-
-    if len(routes) == 1:
-        ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
-        graph_type = "route"
-    elif len(route) == 0:
+    colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈
+   
+    if len(route) == 0:
         ox.plot_graph(G, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", node_size = 8)    
         graph_type = "not a route"
+    elif len(routes) == 1:
+        ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+        graph_type = "route"
     else:
-        ox.plot_graph_routes(G, routes, orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+        ox.plot_graph_routes(G, routes, route_colors = colorss[0:len(routes)], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
         graph_type = "routes"
     
 

@@ -383,7 +383,10 @@ function initMap(initloc) {
       document.getElementById('DP').value = String(arriveMarker.getPosition());
       document.getElementById('SP').value = String(startMarker.getPosition());
     }
-    else{}
+    else{
+      startMarker.setDraggable(false);
+      arriveMarker.setDraggable(false);
+    }
   }, 500)
 
   var markers = [];
@@ -399,7 +402,6 @@ function initMap(initloc) {
 
   $('#radioSP').click(function () {
     setTimeout(function(){
-      startMarker.setDraggable(false);
       var sp = [];
       sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
       console.log(sp[0])
@@ -413,8 +415,7 @@ function initMap(initloc) {
   })
 
   $('#radioDP').click(function () {
-    setTimeout(function(){
-      arriveMarker.setDraggable(false);
+    setTimeout(function(){ 
       var dp = [];
       dp = jsgeocode(document.getElementById('DP').value.split(" / ")[1]);
       console.log(dp[0])
