@@ -395,4 +395,24 @@ function hideMT1 () {
 
 <br/>
 
+* * * * 
+
+<br/>
+
+osmnx 특정 노드 색칠하기
+
+<br/>
+
+osmnx 개발자 geoff boeing이 특정 엣지를 색칠하는데 제안한 방법은 아래와 같다. (노드도 비슷한 방식)
+
+<br/>
+
+~~~python 
+ec = ['b' if (u==4515988732 and v==2021402216) else 'r' for u, v, k in G.edges(keys=True)]
+fig, ax = ox.plot_graph(G, node_color='w', node_edgecolor='k', node_size=30, node_zorder=3, edge_color=ec, edge_linewidth=3)
+~~~
+
+<br/>
+
+노드마다 색을 일일이 지정하는것이 맘에 들지 않아 <code>plot_graph_routes</code>를 통해 구현하였다. <code>plot_graph_routes</code>에서 받는 route의 형태가 node id의 리스트이기 때문에 route에 색칠하려는 노드의 id를 넣기만 하면 된다. 다만 노드의 사이즈는 각각 설정할 수 없다는 것이 단점이다.
 
