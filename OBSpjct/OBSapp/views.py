@@ -1,5 +1,4 @@
 from distutils.debug import DEBUG
-from email.mime import base
 from importlib.resources import path
 from operator import indexOf, truediv
 import re
@@ -24,12 +23,14 @@ from django.utils import timezone
 from PIL import Image
 from io import BytesIO
 import base64
-import mimetypes
 import mpld3
 import pandas as pd
 import json
 import datetime
 import copy
+import queue
+import heapq
+
 
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
@@ -303,8 +304,17 @@ def google_geocode (got_place):
 
 def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
     start = time.time() 
+    
+    #graph_from_address의 생성 포인트(중점)이 SPL, DPL 중점이 되도록(평균)
+    SPLL = SPL[0].split(", ")
+    DPLL = DPL[0].split(", ")
+    SPLL[0] = float(SPLL[0])
+    SPLL[1] = float(SPLL[1])
+    DPLL[0] = float(DPLL[0])
+    DPLL[1] = float(DPLL[1])
+    spldplmiddlepoint = str((SPLL[0] + DPLL[0])/2) + ", " + str((SPLL[1] + DPLL[1])/2)
 
-    G = ox.graph_from_address (SPL[0], network_type = 'walk')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
+    G = ox.graph_from_address (spldplmiddlepoint, network_type = 'walk')        #get 이니까 저기 성남시 경기도 지역 부분을 변수로 
 
     spl = SPL[0].split(", ")
     spllat = float(str(spl[0]).strip())
@@ -328,10 +338,9 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     routes = []
     route = ox.shortest_path(G, orgn, dstn, weight = 'length')
     routes.append(route)
-    routes.append([4686551530])
-    routes.append([4339540676])
-    routes.append([4634545557])
-
+    # routes.append([4686551530])
+    # routes.append([4339540676])
+    # routes.append([4634545557])
     length = nx.shortest_path_length(G=G, source=orgn, target=dstn, weight='length')
 
     gotlst = getNodelst(G, CS2L, MT1L)      #0 : CS2_nodes / 1 : MT1_nodes
@@ -391,39 +400,21 @@ def forMT1(SPL, DPL, ifsame, Max_Length):
 
 
 def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length):
-    distance_from_SP = []
-    to_sort = []
     routes = []
-    total_distance = []     #routes와 1대1 대응 
     rslt = []       # 0 : shortest / 1 : many / 2 : neutral
-    smlst = []
+    
+    for node in CS2_nodes:
+        ifvisited = [False]*len(CS2_nodes)
+        route = [] 
+        route.append(node)
+    
 
-    #SPL부터 모든 편의점까지 거리 append(직선거리X, walk 실거리)
-    for i in range(0, len(CS2_nodes), 1):
-        to_append = 0
-        to_append = nx.shortest_path_length(G=G, source=orgn, target=CS2_nodes[i], weight='length')
-        distance_from_SP.append(to_append)
-        to_sort.append(to_append)
-
-    to_sort.sort()         
-
-    for i in range(0, len(CS2_nodes), 1):     #factorial 1단계 
-        CS2_nodes_c = copy.deepcopy(CS2_nodes)      #CS2_nodes deepcopy
-        distnce = 0
-        route = []      
-        indx = distance_from_SP.index(to_sort[i])       #정렬된 순서가 가르키는 원래 거리
-        a = CS2_nodes_c[indx]
-        distnce += to_sort[i]
-        route.append(orgn)
-        route.append(a)
-        CS2_nodes_c.remove(a)
-        distance_from_SP.remove(distance_from_SP[indx])
-        # new_distance = 
-        print(route)
-    return
-
-
-def BFSsearch(G, CS2s, MT1s, orgn, dstn, Max_Length):
+    print("**********************************************")
+    print("**********************************************")
+    print(CS2_nodes)
+    print(ifvisited)
+    print("**********************************************")
+    print("**********************************************")
 
     return
 
