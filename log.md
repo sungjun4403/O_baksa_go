@@ -470,11 +470,63 @@ print(cnt)
 <br/>
 
 ~~~python
+nodes_list = [1, 2, 3, 4]
+ifvisited = [False]*len(nodes_list)
+rslt = []
 
+def jaguar(apxroute, n):
+
+    if n == len(nodes_list):
+        rslt.append(copy.deepcopy(apxroute))
+        return
+
+    for i in range(len(nodes_list)):
+        if not ifvisited[i]:
+            ifvisited[i] = True
+            apxroute.append(nodes_list[i])
+            jaguar(apxroute, n+1)
+            
+            apxroute.pop()
+            ifvisited[i] = False
+            
+jaguar([], 0)
+
+print(rslt)
+print(len(rslt))
 ~~~
 
+<br/>
+
+결과는 위와 동일하게 나온다. 위와 다른점은 실제 코드 실행 횟수가 n 제곱이 아니라 n! 번이라는 것이다. <code>apxroute.pop()</code>를 통해 구현된다. 바꾸면서 어려웠던 점을 꼽으라면 ~~존1나 많지만~~ <code>rslt.append(apxroute)</code> 했을 떄에 결과가 <code>[[], [], [], [], []...]</code> 으로 나온다는 것이였다. 프린트할 때에는 정상적으로 출력되다가 append에서는 아예 보여지지도 않아서 막막했는데 파이썬 리스트의 속성을 안다면 쉽게 해결 할 수 있는 것이였다. 파이썬을 기본적으로 리스트를 대입할 떄(=) 리스트의 인자를 일일이 복사하여 전달하는 것이 아니라 리스트의 포인터를 그대로 전달하기 떄문이였다. 아래는 포인터 전달을 확인하기 위한 예이다.
+ 
+<br/>
 
 ~~~python
+a = [1, 2, 3, 4]
+b = a
 
+print(id(a))    #4463732416   메모리 주소(랜덤)
+print(id(b))    #4463732416
+
+a[0], a[3] = a[3], a[0]   #0번 3번 스왑
+
+print(a)    #[4, 2, 3, 1]   
+print(b)    #[4, 2, 3, 1]   #같이 바뀐 모습
 ~~~
+
+<br/>
+
+rslt.append(apxroute) 했을 떄는 결국 모두 같은 빈 리스트를 가르켜서 그랬다는 것은 결국 id를 찍고난 후에 알 수 있었다.
+
+~~~python
+import copy 
+copy.deepcopy(apxroute)
+~~~
+
+<br/>
+
+deepcopy를 통해 원소만 같은 다른 리스트를 생성하여 해결 할 수 있었다. copy는 1차월 리스트만 복사하고 deepcopy는 리스트 안의 리스트들의 원소까지도 모두 복사한다.
+
+
+
 
