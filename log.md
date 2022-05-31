@@ -416,3 +416,65 @@ fig, ax = ox.plot_graph(G, node_color='w', node_edgecolor='k', node_size=30, nod
 
 노드마다 색을 일일이 지정하는것이 맘에 들지 않아 <code>plot_graph_routes</code>를 통해 구현하였다. <code>plot_graph_routes</code>에서 받는 route의 형태가 node id의 리스트이기 때문에 route에 색칠하려는 노드의 id를 넣기만 하면 된다. 다만 노드의 사이즈는 각각 설정할 수 없다는 것이 단점이다.
 
+~~~python 
+
+~~~
+
+<br/>
+
+* * * *
+
+<br/>
+
+재귀함수 알고리즘 구현하면서 있던 이슈들
+<br/>
+일단 코드에 앞서 이 알고리즘 구현 단계에서는 단일 함수의 결과를 확인하기 위해 프로젝트에 개발에 사용하면 vscode가 아니라 pycharm을 사용하였다(osmnx가 진짜 느리다(cache있어도 5초대).
+~~~python 
+sp = 0
+dp = 10
+nodes = [1, 2, 3, 4]
+apxroutes = []
+cnt = 0
+
+for a in range(0, 4, 1):
+    lst_to_pass = []
+    ifvisited = [False]*len(nodes)
+
+    for b in range(0, 4, 1):
+        lst_to_pass = [a]
+        if b in lst_to_pass:
+            continue
+
+        for c in range(0, 4, 1):
+            lst_to_pass = [a, b]
+            if c in lst_to_pass:
+                continue
+
+            for d in range(0, 4, 1):
+                lst_to_pass = [a, b, c]
+                if d in lst_to_pass:
+                    continue
+
+                route = [sp, nodes[a], nodes[b], nodes[c], nodes[d], dp]
+                apxroutes.append(route)
+
+                cnt += 1
+print(apxroute)
+print(cnt)
+~~~
+
+<br/>
+
+결과는 len(nodes)의 팩토리얼 개로 나왔다(for문 횟수는 n의 n제곱 만큼이지만 실제로 무언가 실행되는 함수는 n!번 만큼 돌아가게 된다). 순서있게 배열한 모든 경우의 수이다. 이를 재활용 가능하도록 재귀함수로 다듬은 코드는 다음과 같다. 
+
+<br/>
+
+~~~python
+
+~~~
+
+
+~~~python
+
+~~~
+
