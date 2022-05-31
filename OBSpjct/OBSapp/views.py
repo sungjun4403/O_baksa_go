@@ -334,14 +334,10 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
         MT1L = [[]]
         MT1L[0].append(dpllat)
         MT1L[0].append(dpllng)
-
+    #nx.shortest_path_length(G, source=routes[p][i-1], target=routes[p][i], weight='length')
+    #ox.shortest_path(G, orgn, dstn, weight = 'length')
     routes = []
-    route = ox.shortest_path(G, orgn, dstn, weight = 'length')
-    routes.append(route)
-    # routes.append([4686551530])
-    # routes.append([4339540676])
-    # routes.append([4634545557])
-    length = nx.shortest_path_length(G=G, source=orgn, target=dstn, weight='length')
+    
 
     gotlst = getNodelst(G, CS2L, MT1L)      #0 : CS2_nodes / 1 : MT1_nodes
     CS2_nodes = gotlst[0]
@@ -350,7 +346,7 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
 
     colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈
    
-    if len(route) == 0:
+    if len(routes) == 0:
         ox.plot_graph(G, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", node_size = 8)    
         graph_type = "not a route"
     elif len(routes) == 1:
@@ -370,11 +366,9 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     print("===========================")
     print(str(process_time) + " sec")
     print(graph_type)
-    print(orgn)
-    print(dstn)
+    print(orgn, dstn)
     print(CS2_nodes)
     print(MT1_nodes)
-    print(route)
     print("===========================")
     print()
 
