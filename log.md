@@ -491,12 +491,12 @@ def jaguar(apxroute, n):
 
     for i in range(len(nodes_list)):
         if not ifvisited[i]:
-            ifvisited[i] = True
-            apxroute.append(nodes_list[i])
+            ifvisited[i] = True 
+            apxroute.append(nodes_list[i])    
             jaguar(apxroute, n+1)
             
-            apxroute.pop()
-            ifvisited[i] = False
+            apxroute.pop()  
+            ifvisited[i] = False    
             
 jaguar([], 0)
 
@@ -527,6 +527,8 @@ print(b)    #[4, 2, 3, 1]   #같이 바뀐 모습
 
 rslt.append(apxroute) 했을 떄는 결국 모두 같은 빈 리스트를 가르켜서 그랬다는 것은 결국 id를 찍고난 후에 알 수 있었다.
 
+<br/>
+
 ~~~python
 import copy 
 copy.deepcopy(apxroute)
@@ -539,7 +541,11 @@ deepcopy를 통해 원소만 같은 다른 리스트를 생성하여 해결 할 
 <br/>
 
 
+
 <br/>
+
+
+
 
 
 
