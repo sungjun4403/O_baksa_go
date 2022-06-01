@@ -414,10 +414,19 @@ fig, ax = ox.plot_graph(G, node_color='w', node_edgecolor='k', node_size=30, nod
 
 <br/>
 
-노드마다 색을 일일이 지정하는것이 맘에 들지 않아 <code>plot_graph_routes</code>를 통해 구현하였다. <code>plot_graph_routes</code>에서 받는 route의 형태가 node id의 리스트이기 때문에 route에 색칠하려는 노드의 id를 넣기만 하면 된다. 다만 노드의 사이즈는 각각 설정할 수 없다는 것이 단점이다.
+노드마다 색을 일일이 지정하는것이 맘에 들지 않아 <code>plot_graph_routes</code>를 통해 구현하였다. <code>plot_graph_routes</code>에서 받는 route의 형태가 node id의 리스트이기 때문에 route에 색칠하려는 노드의 id를 넣기만 하면 된다. 다만 노드의 사이즈는 각각 설정할 수 없다는 것과 순서대로 색상이 지정된가는 것이 단점이다. 아래는 그 코드이다 
 
 ~~~python 
+colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈 
 
+routes = [route, route, route...]   #route는 노드들의 리스트(그래프 상에서 끊겨있지 않음)
+
+if len(routes) == 1:
+    ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+    graph_type = "route"    #로직 후 확인하기 위해 출력 할 내용 
+else:
+    ox.plot_graph_routes(G, routes, route_colors = colorss[0:len(routes)], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+    graph_type = "routes"
 ~~~
 
 <br/>
@@ -526,6 +535,11 @@ copy.deepcopy(apxroute)
 <br/>
 
 deepcopy를 통해 원소만 같은 다른 리스트를 생성하여 해결 할 수 있었다. copy는 1차월 리스트만 복사하고 deepcopy는 리스트 안의 리스트들의 원소까지도 모두 복사한다.
+
+<br/>
+
+
+<br/>
 
 
 
