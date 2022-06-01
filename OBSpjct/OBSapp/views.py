@@ -3,6 +3,7 @@ from importlib.resources import path
 from operator import indexOf, truediv
 import re
 from turtle import distance
+from xml.dom.minicompat import NodeList
 from django.shortcuts import redirect, render
 from django.conf import settings
 from .models import *
@@ -35,7 +36,9 @@ import heapq
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
 ox.__version__
-# Create your views here.
+sys.setrecursionlimit(10**7)
+
+
 def home (request):
     return render(request, 'home.html')
 
@@ -133,7 +136,7 @@ def get_options(request):
         MT1 = []
         MT1L = []
 
-    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L)
+    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2)
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
     
@@ -163,7 +166,6 @@ def get_options(request):
     MT1str10 = lstTostr(MT1, 10)
     MT1str11 = lstTostr(MT1, 11)
 
-    print("**********************************************************************************************************************************************************************")
     return render(request, 'show_options.html', {
         'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL, 
         'CS2str0' : CS2str0, 'CS2str1':CS2str1, 'CS2str2':CS2str2, 'CS2str3': CS2str3, 'CS2str4':CS2str4, 'CS2str5':CS2str5, 'CS2str6':CS2str6, 'CS2str7':CS2str7, 'CS2str8':CS2str8, 'CS2str9':CS2str9, 'CS2str10':CS2str10, 'CS2str11': CS2str11,
@@ -302,7 +304,7 @@ def google_geocode (got_place):
     return llst
 
 
-def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
+def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
     start = time.time() 
     
     #graph_from_address의 생성 포인트(중점)이 SPL, DPL 중점이 되도록(평균)
@@ -342,7 +344,7 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L):      #Starting_Point_Lis
     gotlst = getNodelst(G, CS2L, MT1L)      #0 : CS2_nodes / 1 : MT1_nodes
     CS2_nodes = gotlst[0]
     MT1_nodes = gotlst[1]
-    DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length)
+    DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
 
     colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈
    
@@ -393,24 +395,30 @@ def forMT1(SPL, DPL, ifsame, Max_Length):
     return rslt
 
 
-def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length):
-    routes = []
-    rslt = []       # 0 : shortest / 1 : many / 2 : neutral
-    
-    for node in CS2_nodes:
-        ifvisited = [False]*len(CS2_nodes)
-        route = [] 
-        route.append(node)
-    
+def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
+    nodes_list = []
+    if ifMT1 == "True": nodes_list += MT1_nodes
+    if ifCS2 == "True": nodes_list += CS2_nodes
+    ifvisited = [False]*len(nodes_list)
+    rslt = []
 
-    print("**********************************************")
-    print("**********************************************")
-    print(CS2_nodes)
-    print(ifvisited)
-    print("**********************************************")
-    print("**********************************************")
+    def jaguar(apxroute, n):        #재귀함수
 
-    return
+        if n == len(nodes_list):
+            rslt.append(copy.deepcopy(apxroute))
+            return
+
+        for i in range(len(nodes_list)):
+            if not ifvisited[i]:
+                ifvisited[i] = True
+                apxroute.append(nodes_list[i])
+                jaguar(apxroute, n+1)
+
+                apxroute.pop()
+                ifvisited[i] = False       
+
+    jaguar([], 0)
+    print(len(rslt))
 
 
 def getNodelst(G, CS2L, MT1L):      #get nearest_nodes 

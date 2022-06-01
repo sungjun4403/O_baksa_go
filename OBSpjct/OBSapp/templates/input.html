@@ -169,7 +169,7 @@ function getUserLoaction() {
 }
 
 function successCallback(event) {
-  document.getElementById('sample3_address').value = String(event.coords.latitude) + ", " + String(event.coords.longitude);
+  document.getElementById('sample3_address').value = "(" + String(event.coords.latitude) + ", " + String(event.coords.longitude) + ")";
 }
 </script>
 
