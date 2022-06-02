@@ -275,9 +275,12 @@ function MAP() {
 function initMap(initloc) {
   ifMapIinited = true
   const latlng = initloc.split(', ');
+  latlng[0] = latlng[0].slice(1, -1)
+  latlng[1] = latlng[1].slice(0, -2)
   lat = parseFloat(latlng[0]);
   lng = parseFloat(latlng[1]);
-
+  console.log(lat)
+  console.log(lng)
   var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
     mapOption = {
       center: new kakao.maps.LatLng(lat, lng),

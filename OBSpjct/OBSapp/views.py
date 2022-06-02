@@ -1,5 +1,6 @@
 from distutils.debug import DEBUG
 from importlib.resources import path
+from math import dist
 from operator import indexOf, truediv
 import re
 from turtle import distance
@@ -24,14 +25,12 @@ from django.utils import timezone
 from PIL import Image
 from io import BytesIO
 import base64
-import mpld3
 import pandas as pd
 import json
 import datetime
 import copy
 import queue
 import heapq
-
 
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
@@ -93,50 +92,42 @@ def get_options(request):
     
     DPL = [None] * 3
     ads = address
-    try:
+    try:        #좌표계 형식으로 들어왔는지 (37.xxxx, 127.zzzz)
         int(address[5:9])
         DPLformat = "loc"
         address = ads
-    except:
+    except:         #좌표계 아니라서 지오코딩 해줘야 되는지 
         DPLformat = "notloc"
 
-    if DPLformat == "loc":
+    if DPLformat == "loc":      #좌표계 형식
         DPL[0] = address
         DPL[2] = 'location'
         print(str(DPL[0][:10]) + " " + str(DPL[0][12:])) 
         print("=================")
         print("location")
         print("=================")
-    else:
+    else:       #좌표계 아닌 형식 지오코딩
         DPL = google_geocode(str(address))
     
-    try:  
-        if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
-            pass
-        else:
-            Max_Length = int(Max_Length)        
-
-    except:
-        return redirect('input')        #숫자가 아닐떄
-    
-    if str(Max_Length).strip() == "" :      #아무값도 안들어왔을때 
+    if str(Max_Length).strip() == "" :      #Max_Length 아무값도 안들어왔을때 
         Max_Length = 1000
     
     #주변 편의점, 마트 
-    if ifCS2 == "True": 
+    if ifCS2 == "True":         #CS2 구하기로 했을때
         CS2 = forCS2(SPL, DPL, ifsame, Max_Length)
         CS2L = getlst(CS2)
-    else: 
+    else:       #CS2 안구하기로 했을때
         CS2 = []
         CS2L = []
-    if ifMT1 == "True": 
+
+    if ifMT1 == "True":         #MT1 구하기로 했을때 
         MT1 = forMT1(SPL, DPL, ifsame, Max_Length)
         MT1L = getlst(MT1)
-    else: 
+    else:       #MT1 안구하기로 했을때 
         MT1 = []
         MT1L = []
 
-    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2)
+    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1)
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
     
@@ -169,7 +160,8 @@ def get_options(request):
     return render(request, 'show_options.html', {
         'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL, 
         'CS2str0' : CS2str0, 'CS2str1':CS2str1, 'CS2str2':CS2str2, 'CS2str3': CS2str3, 'CS2str4':CS2str4, 'CS2str5':CS2str5, 'CS2str6':CS2str6, 'CS2str7':CS2str7, 'CS2str8':CS2str8, 'CS2str9':CS2str9, 'CS2str10':CS2str10, 'CS2str11': CS2str11,
-        'MT1str0':MT1str0, 'MT1str1':MT1str1, 'MT1str2':MT1str2, 'MT1str3':MT1str3, 'MT1str4':MT1str4, 'MT1str5':MT1str5, 'MT1str6':MT1str6, 'MT1str7':MT1str7, 'MT1str8':MT1str8, 'MT1str9':MT1str9, 'MT1str10':MT1str10, 'MT1str11':MT1str11
+        'MT1str0':MT1str0, 'MT1str1':MT1str1, 'MT1str2':MT1str2, 'MT1str3':MT1str3, 'MT1str4':MT1str4, 'MT1str5':MT1str5, 'MT1str6':MT1str6, 'MT1str7':MT1str7, 'MT1str8':MT1str8, 'MT1str9':MT1str9, 'MT1str10':MT1str10, 'MT1str11':MT1str11, 
+        # 'options' : options
         }) 
 
 
@@ -304,7 +296,7 @@ def google_geocode (got_place):
     return llst
 
 
-def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
+def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1):      #Starting_Point_List, Destination_List / each list contains 'formatted_addres', 'location', 'address_type'
     start = time.time() 
     
     #graph_from_address의 생성 포인트(중점)이 SPL, DPL 중점이 되도록(평균)
@@ -338,14 +330,20 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2):      #Star
         MT1L[0].append(dpllng)
     #nx.shortest_path_length(G, source=routes[p][i-1], target=routes[p][i], weight='length')
     #ox.shortest_path(G, orgn, dstn, weight = 'length')
-    routes = []
     
-
-    gotlst = getNodelst(G, CS2L, MT1L)      #0 : CS2_nodes / 1 : MT1_nodes
+    gotlst = getNodelst(G, CS2L, MT1L, CS2, MT1, ifCS2, ifMT1)      #0 : CS2_nodes / 1 : MT1_nodes
     CS2_nodes = gotlst[0]
     MT1_nodes = gotlst[1]
-    DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
+    CS2_nodes_7 = gotlst[2]
+    MT1_nodes_7 = gotlst[3]
+    
+    DFSlst = DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
+    #DFSlst 0 : 모든 경우의 수 / 1 : 각 경우의 수 마다 길이 / 2 : 길이 순서 인덱스 리스트
 
+    getOptionStr(DFSlst, CS2_nodes_7, MT1_nodes_7)
+
+    routes = getRoutes(G, [3662605199, 4338819561])
+    
     colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈
    
     if len(routes) == 0:
@@ -401,6 +399,7 @@ def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
     if ifCS2 == "True": nodes_list += CS2_nodes
     ifvisited = [False]*len(nodes_list)
     rslt = []
+    rslt_distance = []
 
     def jaguar(apxroute, n):        #재귀함수
 
@@ -418,10 +417,45 @@ def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
                 ifvisited[i] = False       
 
     jaguar([], 0)
-    print(len(rslt))
+
+    for p in range(0, len(rslt), 1):        #구한 노드 순서 맨 앞 맨 뒤에 orgn, dstn append 하는 메서드 
+        rslt[p].insert(0, orgn)         #approximate route 맨 앞에 origin append
+        rslt[p].insert(len(rslt[p]), dstn)      #approximate route 맨 뒤에 destination apped
+    for q in range(0, len(rslt), 1):        #각 경우별 거리 합 구하는 로직. 다익스트라
+        distanc = 0
+        for x in range(1, len(rslt[q]), 1):
+            distanc += nx.shortest_path_length(G, source=rslt[q][x-1], target=rslt[q][x], weight='length')
+        rslt_distance.append(distanc)
+
+    rslt_distance_c = copy.deepcopy(rslt_distance)      #순서 뽑기 위한 사본
+    rslt_distance_c.sort()      
+
+    rslt_distance_cc = copy.deepcopy(rslt_distance)     #사본 순서 리스트 seq에 중복 원소 인덱스 하나 반환 막기 위해
+    
+    rslt_distance_seq = []
+
+    for x in range(0, len(rslt_distance), 1):
+        indx = rslt_distance_cc.index(rslt_distance_c[x])
+        rslt_distance_seq.append(indx)
+        rslt_distance_cc[indx] = False      #이미 찾은건 False로. 다른 위치 같은 요소가 같은 인덱스 반환하는것 막기 위함, 0, 0, 5, 3, 4 ,2  -> 0, 1, 5, 3, 4, 2
 
 
-def getNodelst(G, CS2L, MT1L):      #get nearest_nodes 
+    if rslt_distance.count(rslt_distance_c[0]) == 1:        #최단 경로가 하나일 떄 
+        pass
+    else:       #최단 경로가 하나가 아닐떄 
+        pass
+    
+    rrslt = []
+
+    for y in range(0, len(rslt_distance_seq), 1):       #순서대로 순서대로
+        rrslt.append(rslt[rslt_distance_seq.index(y)])
+
+    rtnlst = [rrslt, rslt_distance]
+
+    return rtnlst
+
+
+def getNodelst(G, CS2L, MT1L, CS2, MT1, ifCS2, ifMT1):      #get nearest_nodes 
     rslt = []
     cs2nodes = []
     mt1nodes = [] 
@@ -429,18 +463,39 @@ def getNodelst(G, CS2L, MT1L):      #get nearest_nodes
     cs2lng = []
     mt1lng = []
     mt1lat = []
+    cs2nodes_7 = []
+    mt1nodes_7 = []
 
     for p in range(0, len(CS2L), 1):
         cs2lat.append(float(CS2L[p][0]))
         cs2lng.append(float(CS2L[p][1]))
+        if ifCS2 == "True":
+            cs2nodes_7.append(CS2[p][7])
     cs2nodes = ox.nearest_nodes(G, cs2lng, cs2lat)
     
     for q in range(0, len(MT1L), 1):
-        mt1lat.append(float(CS2L[q][0]))
-        mt1lng.append(float(CS2L[q][1]))
-        mt1nodes.append(ox.nearest_nodes(G, mt1lng, mt1lat))
+        mt1lat.append(float(MT1L[q][0]))
+        mt1lng.append(float(MT1L[q][1]))
+        if ifMT1 == "True":
+           mt1nodes_7.append(MT1[q][7])
     mt1nodes = ox.nearest_nodes(G, mt1lng, mt1lat)
 
     rslt.append(cs2nodes)
     rslt.append(mt1nodes)
+    rslt.append(cs2nodes_7)
+    rslt.append(mt1nodes_7)
+
     return rslt 
+
+
+def getRoutes(G, nodelist):
+    routes = []
+    for i in range(1, len(nodelist), 1):
+        route = ox.shortest_path(G, nodelist[i-1], nodelist[i], weight = 'length')
+        routes.append(route)
+    return routes
+
+
+def getOptionStr(SRClist, CS2_nodes_7, MT1_nodes_7):
+    print(SRClist[0])
+    print(len(SRClist[0]))
