@@ -8,9 +8,9 @@ class ConfigDEV():
             'default': {
                 'ENGINE': 'django.db.backends.mysql',
                 'NAME': 'database1',
-                'USER' : 'root',
+                'USER' : 'admin',
                 'PASSWORD' : 'S!j3033212',
-                'HOST' : '127.0.0.1',
+                'HOST' : 'database1.csjvf23ojub6.ap-northeast-2.rds.amazonaws.com',
                 'PORT' : '3306',
                 'OPTIONS': {
                             'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
