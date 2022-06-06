@@ -32,7 +32,6 @@ munkres==1.1.4
 mysqlclient
 networkx 
 numpy 
-osmnx 
 packaging 
 pandas==1.4.2
 Pillow 
@@ -44,7 +43,6 @@ pyproj
 PySocks 
 python-dateutil 
 pytz 
-rasterio 
 requests 
 Rtree 
 scikit-learn 
