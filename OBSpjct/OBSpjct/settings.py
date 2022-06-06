@@ -1,6 +1,9 @@
+from distutils.command.config import config
 from pathlib import Path
 import os 
-
+from config_ops import ConfigDEV
+configg = ConfigDEV()
+SECRET_KEY = configg.SECRET_KEY
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

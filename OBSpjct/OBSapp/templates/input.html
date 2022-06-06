@@ -24,7 +24,7 @@
   <form action="{% url 'get_options' %}" method="POST">
     {% csrf_token %}
 
-<div class="input-group mb-3">
+<div class="input-group" style="margin-bottom: 3px;">
   <span class="input-group-text" id="">Destination</span>
   <div class="input-group-text">
     <input class="form-check-input mt-0" type="checkbox" name="ifsame" value="1" aria-label="Checkbox for following text input" id="ifsame" onclick="onclickIfsame()">
@@ -33,26 +33,26 @@
 </div>
 <!-- =========================================================== -->
 <div class="input-group mb-3">
-  <span class="input-group-text" id="">Starting Point</span>
+  <span class="input-group-text" id="">Origin</span>
   <input type="text" class="form-control" name="Starting_Point" aria-label="Text input with checkbox" required id="SP" readonly>
   <!-- 참고항목은 필요 X -->
 </div>
 
-<div id="map" style="width:100%; height:300px;"></div>
+<div id="map" style="width:100%; height:400px;"></div>
 <br>
 <!-- =========================================================== -->
 <div class="form-check form-check-inline">
   <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked
     onclick="onclickSP();">
-  <label class="form-check-label" for="inlineRadio1">send to SP</label>
+  <label class="form-check-label" for="inlineRadio1">Origin</label>
 </div>
 <div class="form-check form-check-inline">
   <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"
     onclick="onclickDP();">
-  <label class="form-check-label" for="inlineRadio2">send to DP</label>
+  <label class="form-check-label" for="inlineRadio2">Destination</label>
 </div>
-<button type="button" class="btn btn-secondary btn-sm" onclick="sendInfoSP();" id="radioSP">send to SP</button>
-<button type="button" class="btn btn-secondary btn-sm" onclick="sendInfoDP();" id="radioDP">send to DP</button>
+<button type="button" class="btn btn-secondary btn-sm" onclick="sendInfoSP();" id="radioSP">send to Origin</button>
+<button type="button" class="btn btn-secondary btn-sm" onclick="sendInfoDP();" id="radioDP">send to Destination</button>
 <br><br>
 <!-- =========================================================== -->
 <input type="text" class="form-control" name="SP_postcode" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sample3_postcode" placeholder="우편번호">
@@ -190,13 +190,13 @@ function jsgeocode(to_geocode) {
 <!-- send info -->
 <script>
 function onclickSP() {
-  document.getElementById('radioDP').style.visibility = 'hidden';
-  document.getElementById('radioSP').style.visibility = 'visible';
+  document.getElementById('radioDP').style.display = 'none';
+  document.getElementById('radioSP').style.display = 'inline';
 
 }
 function onclickDP() {
-  document.getElementById('radioSP').style.visibility = 'hidden';
-  document.getElementById('radioDP').style.visibility = 'visible';
+  document.getElementById('radioSP').style.display = 'none';
+  document.getElementById('radioDP').style.display = 'inline';
 }
 function sendInfoSP() {
   SP1 = document.getElementById('sample3_postcode').value
@@ -383,6 +383,7 @@ function initMap(initloc) {
     if (document.getElementById('flexCheckChecked').checked) {
       startMarker.setDraggable(true);
       arriveMarker.setDraggable(true);
+      fst = 0;
       document.getElementById('DP').value = String(arriveMarker.getPosition());
       document.getElementById('SP').value = String(startMarker.getPosition());
     }
@@ -400,46 +401,67 @@ function initMap(initloc) {
     for (i = 0; i < markers.length; i++) {
         bounds.extend(markers[i].getPosition());
     }
+    console.log('map bound set');
     map.setBounds(bounds);
   }
 
+  fst = 0;
   $('#radioSP').click(function () {
-    setTimeout(function(){
+    SPI = setInterval(function(){
+      
+      if (document.getElementById('flexCheckChecked').checked) {
+        clearInterval(SPI)
+      }
       var sp = [];
       sp = jsgeocode(document.getElementById('SP').value.split(" / ")[1]);
       console.log(sp[0])
       console.log(sp[1])
       startMarker.setPosition(new kakao.maps.LatLng(sp[0], sp[1]));
-      setTimeout(function(){
-        setMarkersBound();
-      }, 500)
-      
+      if (fst == 1){
+        setTimeout(function(){
+          setMarkersBound();
+        }, 500)
+      }
+      fst = fst + 1;
     }, 1000)
   })
 
   $('#radioDP').click(function () {
-    setTimeout(function(){ 
+    DPI = setInterval(function(){ 
+      if (document.getElementById('flexCheckChecked').checked) {
+        clearInterval(DPI)
+      }
       var dp = [];
       dp = jsgeocode(document.getElementById('DP').value.split(" / ")[1]);
       console.log(dp[0])
       console.log(dp[1])
       arriveMarker.setPosition(new kakao.maps.LatLng(dp[0], dp[1]));
-      setTimeout(function(){
-        setMarkersBound();
-      }, 500)
-      
+      if (fst == 1) {
+        setTimeout(function(){
+          setMarkersBound();
+        }, 500)
+      }
+      fst = fst + 1;
     }, 1000)
   })
 }
 
 </script>
 <!-- =========================================================== -->
-<div class="input-group mb-3">
+<div class="input-group">
   <span class="input-group-text" id="inputGroup-sizing-default">Max length (m)</span>
   <input type="number" min = "100" max="20000" step = "100" class="form-control" aria-label="Sizing example input" name="Max_Length" aria-describedby="inputGroup-sizing-default">
 </div>
-<p class="mt-5 mb-3 text-muted">min = 100, max = 20000 defalut == 1000</p>
+
+<p class="text-muted" style="margin-top: 5px;">min = 100, max = 20000 defalut == 1000</p>
 <br>
+
+<div class="input-group">
+  <span class="input-group-text" id="inputGroup-sizing-default">경유할 지점 개수</span>
+  <input type="number" min = "1" max = "7" step = "1" class="form-control" aria-label="Sizing example input" name="Max_points" aria-describedby="inputGroup-sizing-default" required>
+</div>
+
+<p class="text-muted" style="margin-top: 5px;">min = 1, max = 7</p>
 <!-- =========================================================== -->
 <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
   <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" name="CS2" value="True">
@@ -449,10 +471,11 @@ function initMap(initloc) {
   <label class="btn btn-outline-primary" for="btncheck2">마트</label>
 </div>
 <!-- =========================================================== -->
+<br><br>
 <div style="text-align: center;">
   <button type="submit" class="btn btn-primary btn-lg">Submit</button>
 </div>
-<br><br><br>
+<br>
 </form>
 </div>
 </body>

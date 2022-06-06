@@ -2,6 +2,7 @@ from distutils.debug import DEBUG
 from importlib.resources import path
 from math import dist
 from operator import indexOf, truediv
+from platform import node
 import re
 from turtle import distance
 from xml.dom.minicompat import NodeList
@@ -35,7 +36,7 @@ import heapq
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
 ox.__version__
-sys.setrecursionlimit(10**7)
+# sys.setrecursionlimit(10**7)
 
 
 def home (request):
@@ -51,6 +52,8 @@ def get_options(request):
     Max_Length = request.POST.get('Max_Length')
     ifMT1 = request.POST.get('MT1')
     ifCS2 = request.POST.get('CS2')
+    Max_Points = request.POST.get('Max_points')
+    Max_Points = int(Max_Points)
     #0 : postcode / 1 : address / 2 : detailAddress / 3 : extraAddress
     if Starting_Point[-1] == ')'and Starting_Point[0] == '(':
         Starting_Point.strip()
@@ -115,6 +118,7 @@ def get_options(request):
     #주변 편의점, 마트 
     if ifCS2 == "True":         #CS2 구하기로 했을때
         CS2 = forCS2(SPL, DPL, ifsame, Max_Length)
+        CS2 = CS2[:Max_Points]       #최대 Max_Points개 
         CS2L = getlst(CS2)
     else:       #CS2 안구하기로 했을때
         CS2 = []
@@ -122,12 +126,40 @@ def get_options(request):
 
     if ifMT1 == "True":         #MT1 구하기로 했을때 
         MT1 = forMT1(SPL, DPL, ifsame, Max_Length)
+        MT1 = MT1[:Max_Points]
         MT1L = getlst(MT1)
     else:       #MT1 안구하기로 했을때 
         MT1 = []
         MT1L = []
 
-    get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1)
+
+    if ifMT1 == "True" and ifCS2 == "True":     #둘다 구하면 합쳐서 4개로 제한 
+        if Max_Points/2 != int(Max_Points/2):
+            hmCS2 = (Max_Points+1)/2
+            hmMT1 = (Max_Points-1)/2
+        else: 
+            hmCS2 = (Max_Points)/2
+            hmMT1 = (Max_Points)/2
+        CS2 = forCS2(SPL, DPL, ifsame, Max_Length)
+        MT1 = forMT1(SPL, DPL, ifsame, Max_Length)
+        if len(MT1)-1 <= hmMT1:
+            hmCS2 = Max_Points-len(MT1)
+        MT1 = MT1[:int(hmMT1)]
+        MT1L = getlst(MT1)
+        CS2 = CS2[:int(hmCS2)]       #최대 4개 4!
+        CS2L = getlst(CS2)
+
+    rtnlst = get_map(ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1)
+    apxroute = rtnlst[0]
+    CS2_nodes_7 = rtnlst[1]
+    MT1_nodes_7 = rtnlst[2]
+    CS2_nodes = rtnlst[3]
+    MT1_nodes = rtnlst[4]
+
+    optionslst = getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, DPL, Starting_Point, Destination, CS2L, MT1L)
+    options = optionslst[0]
+    optoinsurl = optionslst[1]
+
     time.sleep(0.1)
     os.system("python manage.py collectstatic --no-input")
     
@@ -161,7 +193,7 @@ def get_options(request):
         'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL, 
         'CS2str0' : CS2str0, 'CS2str1':CS2str1, 'CS2str2':CS2str2, 'CS2str3': CS2str3, 'CS2str4':CS2str4, 'CS2str5':CS2str5, 'CS2str6':CS2str6, 'CS2str7':CS2str7, 'CS2str8':CS2str8, 'CS2str9':CS2str9, 'CS2str10':CS2str10, 'CS2str11': CS2str11,
         'MT1str0':MT1str0, 'MT1str1':MT1str1, 'MT1str2':MT1str2, 'MT1str3':MT1str3, 'MT1str4':MT1str4, 'MT1str5':MT1str5, 'MT1str6':MT1str6, 'MT1str7':MT1str7, 'MT1str8':MT1str8, 'MT1str9':MT1str9, 'MT1str10':MT1str10, 'MT1str11':MT1str11, 
-        # 'options' : options
+        'options' : options, 'lenoptions' : len(options), 'optionsurl' :optoinsurl,
         }) 
 
 
@@ -171,6 +203,8 @@ def end(request):
 
 def search_CS2(SPL, DPL, ifsame, Max_Length):        #MT1, CS2, 
     loc = SPL[0].split(", ")
+    print(SPL[0].split(", "))
+    print(DPL[0].split(", "))
     rest_api_key = '39b09cd965f4787143f206403f3f370b'
     header = {'Authorization': 'KakaoAK ' + rest_api_key}
     params = {
@@ -268,6 +302,7 @@ def getlst (places):
         to_append_lst = [] 
         to_append_lst.append(place[11])
         to_append_lst.append(place[10])
+        to_append_lst.append(place[7])
         lst.append(to_append_lst)
     
     return lst
@@ -336,24 +371,27 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1): 
     MT1_nodes = gotlst[1]
     CS2_nodes_7 = gotlst[2]
     MT1_nodes_7 = gotlst[3]
-    
-    DFSlst = DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
+
+    print(gotlst)
+
+    routes = []
+    shrtstpaths = DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
     #DFSlst 0 : 모든 경우의 수 / 1 : 각 경우의 수 마다 길이 / 2 : 길이 순서 인덱스 리스트
 
-    getOptionStr(DFSlst, CS2_nodes_7, MT1_nodes_7)
+    # getOptionStr(DFSlst, CS2_nodes_7, MT1_nodes_7)
 
-    routes = getRoutes(G, [3662605199, 4338819561])
-    
-    colorss = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'violet', 'brown']       #빨주노초파남보갈
+    routes = getRoutes(G, shrtstpaths)
+
+    colorss = ['red', 'yellow', 'green', 'blue', 'violet', 'pink', 'brown', 'r', 'r', 'r']       #빨주노초파남보갈
    
     if len(routes) == 0:
-        ox.plot_graph(G, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", node_size = 8)    
+        ox.plot_graph(G, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", node_size = 5)    
         graph_type = "not a route"
     elif len(routes) == 1:
-        ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+        ox.plot_graph_route(G, routes[0], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 5)
         graph_type = "route"
     else:
-        ox.plot_graph_routes(G, routes, route_colors = colorss[0:len(routes)], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 8)
+        ox.plot_graph_routes(G, routes, route_colors = colorss[0:len(routes)], orig_dest_size=100, show = False, save = True, filepath = "OBSpjct/static/graphimage.png", route_linewidth = 5, node_size = 5)
         graph_type = "routes"
     
 
@@ -371,6 +409,10 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1): 
     print(MT1_nodes)
     print("===========================")
     print()
+
+    rtnlst = [shrtstpaths, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes]
+
+    return rtnlst
 
 
 def forCS2(SPL, DPL, ifsame, Max_Length):
@@ -400,6 +442,7 @@ def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
     ifvisited = [False]*len(nodes_list)
     rslt = []
     rslt_distance = []
+    
 
     def jaguar(apxroute, n):        #재귀함수
 
@@ -430,29 +473,8 @@ def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
     rslt_distance_c = copy.deepcopy(rslt_distance)      #순서 뽑기 위한 사본
     rslt_distance_c.sort()      
 
-    rslt_distance_cc = copy.deepcopy(rslt_distance)     #사본 순서 리스트 seq에 중복 원소 인덱스 하나 반환 막기 위해
-    
-    rslt_distance_seq = []
-
-    for x in range(0, len(rslt_distance), 1):
-        indx = rslt_distance_cc.index(rslt_distance_c[x])
-        rslt_distance_seq.append(indx)
-        rslt_distance_cc[indx] = False      #이미 찾은건 False로. 다른 위치 같은 요소가 같은 인덱스 반환하는것 막기 위함, 0, 0, 5, 3, 4 ,2  -> 0, 1, 5, 3, 4, 2
-
-
-    if rslt_distance.count(rslt_distance_c[0]) == 1:        #최단 경로가 하나일 떄 
-        pass
-    else:       #최단 경로가 하나가 아닐떄 
-        pass
-    
-    rrslt = []
-
-    for y in range(0, len(rslt_distance_seq), 1):       #순서대로 순서대로
-        rrslt.append(rslt[rslt_distance_seq.index(y)])
-
-    rtnlst = [rrslt, rslt_distance]
-
-    return rtnlst
+    shrtstpaths = rslt[rslt_distance.index(rslt_distance_c[0])]
+    return shrtstpaths
 
 
 def getNodelst(G, CS2L, MT1L, CS2, MT1, ifCS2, ifMT1):      #get nearest_nodes 
@@ -484,9 +506,8 @@ def getNodelst(G, CS2L, MT1L, CS2, MT1, ifCS2, ifMT1):      #get nearest_nodes
     rslt.append(mt1nodes)
     rslt.append(cs2nodes_7)
     rslt.append(mt1nodes_7)
-
+    
     return rslt 
-
 
 def getRoutes(G, nodelist):
     routes = []
@@ -496,6 +517,78 @@ def getRoutes(G, nodelist):
     return routes
 
 
-def getOptionStr(SRClist, CS2_nodes_7, MT1_nodes_7):
-    print(SRClist[0])
-    print(len(SRClist[0]))
+def getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, DPL, Starting_Point, Destination, CS2L, MT1L):
+    #CS2L = ['37.3779481763451', '127.133053039479', 'CU 분당우성점']
+    L = CS2L + MT1L
+    OptionStr = []
+    rslt = []
+    rrslt = []
+    optionsurl = []
+    apxroute = apxroute[1:-1]
+    nodes = CS2_nodes + MT1_nodes
+    nodes_7 = CS2_nodes_7 + MT1_nodes_7
+    orgn = "(" + str(Starting_Point.split(" / ")[1]) + ")"
+    dstn = "(" + Destination.split(" / ")[1] + ")"
+    for i in range(0, len(apxroute), 1):
+        OptionStr.append(nodes_7[nodes.index(apxroute[i])])
+    
+    OptionStr.insert(0, orgn)
+    OptionStr.insert(len(OptionStr), dstn)
+
+    for p in range(1, len(OptionStr), 1):
+        if OptionStr[p-1] == OptionStr[p]:
+            for q in range(0, len(nodes_7), 1):
+                if nodes_7[q] not in OptionStr:
+                    notexist = nodes_7[q]
+            OptionStr[p] = notexist
+            rslt.append(str(OptionStr[p-1]) + " to " + str(OptionStr[p]))
+        else:    
+            rslt.append(str(OptionStr[p-1]) + " to " + str(OptionStr[p]))
+
+    print(OptionStr)
+    print(nodes_7)
+    orgnlat = SPL[0].split(",")[0]
+    orgnlng = SPL[0].split(",")[1]
+    orgnname = OptionStr[0]
+
+    dstnlat = DPL[0].split(",")[0]
+    dstnlng = DPL[0].split(",")[1]
+    dstnname = OptionStr[-1]
+
+    names = []
+    for i in range(0, len(L), 1):
+        names.append(L[i][2])
+
+    fstlat = L[names.index(OptionStr[1])][0]
+    fstlng = L[names.index(OptionStr[1])][1]
+
+    lastlat = L[names.index(OptionStr[-2])][0]
+    lastlng = L[names.index(OptionStr[-2])][1]
+
+    for q in range(1, len(rslt)-1, 1):
+        slat = L[names.index(OptionStr[q])][0]
+        slng = L[names.index(OptionStr[q])][1]
+        sname = OptionStr[q]
+        elat = L[names.index(OptionStr[q+1])][0]
+        elng = L[names.index(OptionStr[q+1])][1]
+        ename = OptionStr[q+1]
+        optionsurl.append('http://map.naver.com/index.nhn' 
+        + '?slng=' + slng 
+        + '&slat=' + slat 
+        + '&stext=' + sname
+        + '&elng=' + elng
+        + '&elat=' + elat
+        + '&etext=' + ename
+        +'&menu=route' 
+        + '&pathType=3'     #walk
+        )
+        
+    optionsurl.insert(0, 'http://map.naver.com/index.nhn' + '?slng=' + orgnlng + '&slat=' + orgnlat + '&stext=' + orgnname + '&elng=' + fstlng + '&elat=' + fstlat + '&etext=' + OptionStr[1] +'&menu=route' + '&pathType=3')
+    optionsurl.insert(len(optionsurl), 'http://map.naver.com/index.nhn' + '?slng=' + lastlng + '&slat=' + lastlat + '&stext=' + OptionStr[-2] + '&elng=' + dstnlng + '&elat=' + dstnlat + '&etext=' + dstnname +'&menu=route' + '&pathType=3')
+
+    for x in range(0, len(optionsurl), 1):
+        optionsurl[x] = optionsurl[x].replace(" ", "")
+
+    rrslt.append(rslt)
+    rrslt.append(optionsurl)
+    return rrslt
