@@ -1,11 +1,11 @@
 from distutils.command.config import config
 from pathlib import Path
 import os 
-from config_ops import ConfigDEV
+from .config_ops import ConfigDEV
 
 configg = ConfigDEV()
 SECRET_KEY = configg.SECRET_KEY
-
+DATABASES = configg.DATABASES
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -68,19 +68,7 @@ WSGI_APPLICATION = 'OBSpjct.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'database1',
-        'USER' : 'root',
-        'PASSWORD' : 'S!j3033212',
-        'HOST' : '127.0.0.1',
-        'PORT' : '3306',
-        'OPTIONS': {
-                    'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
-                    },
-    }
-}
+
 
 
 # Password validation

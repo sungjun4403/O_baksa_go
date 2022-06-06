@@ -26,7 +26,6 @@ from django.utils import timezone
 from PIL import Image
 from io import BytesIO
 import base64
-import pandas as pd
 import json
 import datetime
 import copy
