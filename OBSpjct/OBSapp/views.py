@@ -35,8 +35,6 @@ import heapq
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
 ox.__version__
-# sys.setrecursionlimit(10**7)
-
 
 def home (request):
     return render(request, 'home.html')

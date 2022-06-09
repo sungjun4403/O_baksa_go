@@ -1,6 +1,5 @@
 from pydoc import classname
 
-
 class ConfigDEV():
     def __init__ (self):
         self.SECRET_KEY = 'django-insecure-uzu67ue$sed=%%($@-xisko&j4jgmk%!71%^48xdf*_e%&dtcr'
@@ -8,7 +7,7 @@ class ConfigDEV():
             'default': {
                 'ENGINE': 'django.db.backends.mysql',
                 'NAME': 'database1',
-                'USER' : 'admin',
+                'USER' : 'root',
                 'PASSWORD' : 'S!j3033212',
                 'HOST' : 'database1.csjvf23ojub6.ap-northeast-2.rds.amazonaws.com',
                 'PORT' : '3306',
