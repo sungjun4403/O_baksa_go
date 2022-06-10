@@ -369,8 +369,6 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1): 
     CS2_nodes_7 = gotlst[2]
     MT1_nodes_7 = gotlst[3]
 
-    print(gotlst)
-
     routes = []
     shrtstpaths = DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
     #DFSlst 0 : 모든 경우의 수 / 1 : 각 경우의 수 마다 길이 / 2 : 길이 순서 인덱스 리스트
@@ -542,8 +540,6 @@ def getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, 
         else:    
             rslt.append(str(OptionStr[p-1]) + " to " + str(OptionStr[p]))
 
-    print(OptionStr)
-    print(nodes_7)
     orgnlat = SPL[0].split(",")[0]
     orgnlng = SPL[0].split(",")[1]
     orgnname = OptionStr[0]
@@ -588,4 +584,5 @@ def getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, 
 
     rrslt.append(rslt)
     rrslt.append(optionsurl)
+    print(optionsurl)
     return rrslt
