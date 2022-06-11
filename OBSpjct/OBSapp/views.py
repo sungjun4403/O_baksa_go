@@ -199,9 +199,11 @@ def end(request):
 
 
 def search_CS2(SPL, DPL, ifsame, Max_Length):        #MT1, CS2, 
-    loc = SPL[0].split(", ")
-    print(SPL[0].split(", "))
-    print(DPL[0].split(", "))
+    loc  = [False, False]
+    SPLsplit = SPL[0].split(", ")
+    DPLsplit = DPL[0].split(", ")
+    loc[0] = (float(SPLsplit[0]) + float(DPLsplit[0]))/2
+    loc[1] = (float(SPLsplit[1]) + float(DPLsplit[1]))/2
     rest_api_key = '39b09cd965f4787143f206403f3f370b'
     header = {'Authorization': 'KakaoAK ' + rest_api_key}
     params = {
@@ -239,7 +241,11 @@ def search_CS2(SPL, DPL, ifsame, Max_Length):        #MT1, CS2,
 
 
 def search_MT1(SPL, DPL, ifsame, Max_Length):        #MT1, CS2, 
-    loc = SPL[0].split(", ")
+    loc  = [False, False]
+    SPLsplit = SPL[0].split(", ")
+    DPLsplit = DPL[0].split(", ")
+    loc[0] = (float(SPLsplit[0]) + float(DPLsplit[0]))/2
+    loc[1] = (float(SPLsplit[1]) + float(DPLsplit[1]))/2
     rest_api_key = '39b09cd965f4787143f206403f3f370b'
     header = {'Authorization': 'KakaoAK ' + rest_api_key}
     params = {
@@ -582,7 +588,17 @@ def getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, 
     for x in range(0, len(optionsurl), 1):
         optionsurl[x] = optionsurl[x].replace(" ", "")
 
-    rrslt.append(rslt)
-    rrslt.append(optionsurl)
-    print(optionsurl)
+    optionsurlstr = ""
+    for i in range(0, len(optionsurl), 1):
+        optionsurlstr = optionsurlstr + optionsurl[i] + "^"
+    optionsurlstr = optionsurlstr[:-1]
+
+    optionsstr = ""
+    for q in range(0, len(rslt), 1):
+        optionsstr = optionsstr + rslt[q] + "^"
+    optionsstr = optionsstr[:-1]
+
+    rrslt.append(optionsstr)
+    rrslt.append(optionsurlstr)
+    
     return rrslt

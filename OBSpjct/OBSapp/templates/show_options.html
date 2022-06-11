@@ -65,45 +65,42 @@
     <form action = "{% url 'end' %}">
         <button type="submit" class="btn btn-primary btn-lg">end</button>
     </form>
-
+    <style></style>
 <script>
-    var options = "{{options}}".split(',')
-    var lenoptions = parseInt("{{lenoptions}}")
 
-    //slice 했을떄 좌표계 내의 , 까지 슬라이스 되기 떄문에 처음과 마지막의 좌표계를 다시 묶어주는 과정
-    options[0] = options[0] + options[1]
-    options.splice(1, 1)
-    options[lenoptions-1] = options[lenoptions-1] + options[lenoptions]
-    options.splice(lenoptions, lenoptions)
-    //[] , 제거 
-    options[0] = options[0].slice(7, options[0].length-6)
-    options[lenoptions-1] = options[lenoptions-1].slice(7, options[lenoptions-1].length-7)
-
-    for (i = 1; i < options.length-1; i++) {
-        options[i] = options[i].slice(7,-6)
+    var options = "{{options}}".split("^")
+    var optionsurl = "{{optionsurl}}".split("^")
+    function showcopyalertdiv(x) {
+        document.getElementById(x).style.display = 'inline';
+        setTimeout(function() {
+            document.getElementById(x).style.display = 'none';
+        }, 2000)
     }
-    
-    var optionsurl = "{{optionsurl}}".split(', ')
-
-    optionsurl[0] = optionsurl[0].slice(7,-6)
-    optionsurl[optionsurl.length-1] = optionsurl[optionsurl.length-1].slice(6,-7)
-    
-    for (p = 1; p < optionsurl.length-1; p++) {
-        optionsurl[p] = optionsurl[p].slice(6,-6)
+    function CopytoClipboard(val) {
+        const t = document.createElement("textarea");
+        var valu = optionsurl[val]
+        document.body.appendChild(t);
+        t.value = valu;
+        t.value = t.value.replace(/amp;/g , "")
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+        showcopyalertdiv(val)
     }
-
     var divstr = ""
     function Options() {  
         const element = document.getElementById('divv');
-        for (x = 0; x < lenoptions; x++) {
-            divstr =  divstr + '<a href= ' + optionsurl[x] + ' style = "text-decoration: none;">' + options[x] + '</a>' + '<br>'
+        const imgsrc = "{% static 'copy_icon.png' %}"
+        for (x = 0; x < options.length; x++) {
+            divstr =  divstr + '<a href= ' + optionsurl[x] + ' style = "text-decoration: none;">' + options[x] + '</a>' 
+            + '<button style="margin-left:5px; border: 0; outline: 0; background-color: white;" onclick="CopytoClipboard('+ x +')"><img src="'+ imgsrc +'" alt="" width="14.5px" height="14.5px"></button>' 
+            + '<div id="' + x + '" style="display: none; background-color: gray; color:white; font-size: 100%; border-radius:5px">&nbsp;copied!&nbsp;</div>'
+            + '<br>'
         }
-        element.innerHTML = '<div>' 
-                            + divstr
-                            +'<div>';
-    
+        element.innerHTML = '<div>'+ divstr +'<div>';
     }
-    
+
+    // onclick = "closeCS2Overlay(' + x + ');"
 </script>
 <script>
     var SPL = String("{{SPL.0}}").split(", ");
