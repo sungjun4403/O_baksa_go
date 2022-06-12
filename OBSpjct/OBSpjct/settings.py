@@ -2,6 +2,7 @@ from distutils.command.config import config
 from pathlib import Path
 import os 
 from .config_ops import ConfigDEV
+import pymysql
 
 configg = ConfigDEV()
 SECRET_KEY = configg.SECRET_KEY
@@ -9,7 +10,7 @@ DATABASES = configg.DATABASES
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+pymysql.install_as_MySQLdb()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'OBSapp.apps.ObsappConfig',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
