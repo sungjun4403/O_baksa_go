@@ -1,8 +1,5 @@
 from distutils.debug import DEBUG
 from importlib.resources import path
-from math import dist
-from operator import indexOf, truediv
-from platform import node
 import re
 from django.shortcuts import redirect, render
 from django.conf import settings
