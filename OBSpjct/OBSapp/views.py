@@ -4,8 +4,6 @@ from math import dist
 from operator import indexOf, truediv
 from platform import node
 import re
-from turtle import distance
-from xml.dom.minicompat import NodeList
 from django.shortcuts import redirect, render
 from django.conf import settings
 from .models import *
@@ -34,6 +32,7 @@ import heapq
 
 matplotlib.use('Agg')
 ox.config(use_cache = True, log_console = True)
+# ox.settings.log_console=True
 ox.__version__
 
 def home (request):
