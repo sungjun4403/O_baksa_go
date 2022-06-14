@@ -13,7 +13,7 @@
     <title>PATH</title>
     <link href="{% static 'css/1.css'%}" rel="stylesheet">
 </head>
-<body onload="Options();">
+<body onload="Options(); hideOverlays(); setMarkersBound();">
 <div align = "middle" id = "wrapper">
     <br><br>
     <img src = "{% static 'graphimage.png'%}" alt = "" width = "550" height="550" style="margin-top: 5px; margin-bottom: 5px;">
@@ -21,21 +21,10 @@
     
     {% if ifCS2 == "True" %}
         <h4>found {{lenCS2}} CS2</h4>
-        <br>
-        {% for cs2 in CS2 %}
-            {{cs2.7}} / {{cs2.4}}m from Origin
-            <br>
-        {% endfor %}
     {% endif %}
-    <br>
     
     {% if ifMT1 == "True" %}
         <h4>found {{lenMT1}} MT1</h4>
-        <br>
-        {% for mt1 in MT1 %}
-            {{mt1.7}} / {{mt1.4}}m from Origin
-            <br>
-        {% endfor %}
     {% endif %}
 
     {% if ifMT1 != 'True' and ifCS2 != 'True' %}
@@ -44,28 +33,59 @@
 
     <br><br>
     <h3>PATH</h3>
-    <div id = "divv">
+    <br>
+    <div id = "divv"></div>
 
+    <br><br>
+
+    <div style="margin-bottom: 7%;">
+        <div style="float: left; width: 27%; height: 400px;">
+        {% if ifCS2 == "True" %}
+            {% for cs2 in CS2 %}
+                <div onclick="CS2overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;">
+                    {{cs2.7}}
+                </div>
+            {% endfor %}
+        {% endif %}    
+
+        {% if ifMT1 == "True" %}
+            {% for mt1 in MT1 %}
+                <div onclick="MT1overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;">
+                    {{mt1.7}} 
+                </div>        
+            {% endfor %}
+        {% endif %}
+        </div>
+
+        <div id="map" style="width:73%; height:400px; float: right;"></div>
     </div>
+    <br>
 
-    <br><br>
+    <div>
+        <input class="form-check-input" type="checkbox" value="" id="bsCheck" checked>
+        <label class="form-check-label" for="flexCheckChecked">
+        클릭으로 선 그리기
+        </label>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="setMarkersBound();">setMarkersBound</button>
 
-    <div id="map" style="width:100%; height:400px;"></div>
-    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="setMarkersBound();">setMarkersBound</button>
-    {% if ifCS2 == "True" %}
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showCS2();">show CS2</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideCS2();">hide CS2</button>
-    {% endif %}
+        {% if ifCS2 == "True" %}
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showCS2();">show CS2</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideCS2();">hide CS2</button>
+        {% endif %}
 
-    {% if ifMT1 == "True" %}
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showMT1();">show MT1</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideMT1();">hide MT1</button>
-    {% endif %}
-    <br><br>
-    <form action = "{% url 'end' %}">
-        <button type="submit" class="btn btn-primary btn-lg">end</button>
-    </form>
-    <style></style>
+        {% if ifMT1 == "True" %}
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showMT1();">show MT1</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideMT1();">hide MT1</button>
+        {% endif %}
+        <br><br>
+        <form action = "{% url 'end' %}">
+            <button type="submit" class="btn btn-primary btn-lg">end</button>
+        </form>
+    </div>
+    
+<script>
+
+</script>
 <script>
 
     var options = "{{options}}".split("^")
@@ -446,6 +466,7 @@ function getTimeHTML(distance) {
 
     return content;
 }
+// ==============================
 
     var CS2lst0 = "{{CS2str0}}".split(", ");
     var CS2lst1 = "{{CS2str1}}".split(", ");
@@ -688,10 +709,7 @@ function getTimeHTML(distance) {
             position: MT1marker.getPosition(),       
             map: map,
         });   
-           
-        kakao.maps.event.addListener(MT1marker, 'click', function() {
-            MT1overlay.setMap(map);
-        });
+        
         MT1overlays.push(MT1overlay);
         // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
         
@@ -702,7 +720,15 @@ function getTimeHTML(distance) {
             MT1markers.push(MT1marker); 
         }
     }    
-    
+
+    function CS2overlayclick(indx) {
+        var indx = parseInt(indx)-1;
+        CS2overlays[indx].setMap(map);
+    }
+    function MT1overlayclick(indx) {
+        var indx = parseInt(indx)-1;
+        MT1overlays[indx].setMap(map);
+    }
 
     // 커스텀 오버레이를 닫기 위해 호출되는 함수입니다 
     function closeMT1Overlay(y){
@@ -751,7 +777,23 @@ function getTimeHTML(distance) {
         }
     }
 
+    function hideOverlays() {
+        for (p = 0; p < MT1overlays.length; p++) {
+            MT1overlays[p].setMap(null);
+        }
+        for (p = 0; p < CS2overlays.length; p++) {
+            CS2overlays[p].setMap(null);
+        } 
+    }
 
+    setInterval(function() {
+        if (document.getElementById('bsCheck').checked) {
+            
+        }
+        else {
+
+        }
+    }, 100)
 
 </script>
 </div>
