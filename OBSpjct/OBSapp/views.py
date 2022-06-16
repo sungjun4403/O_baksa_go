@@ -186,7 +186,7 @@ def get_options(request):
         'CS2' : CS2, 'lenCS2' : len(CS2), 'MT1' : MT1, 'lenMT1' : len(MT1), 'Max_Length' : Max_Length, 'ifMT1' : ifMT1, 'ifCS2' : ifCS2, 'SPL' : SPL, 'DPL' : DPL, 
         'CS2str0' : CS2str0, 'CS2str1':CS2str1, 'CS2str2':CS2str2, 'CS2str3': CS2str3, 'CS2str4':CS2str4, 'CS2str5':CS2str5, 'CS2str6':CS2str6, 'CS2str7':CS2str7, 'CS2str8':CS2str8, 'CS2str9':CS2str9, 'CS2str10':CS2str10, 'CS2str11': CS2str11,
         'MT1str0':MT1str0, 'MT1str1':MT1str1, 'MT1str2':MT1str2, 'MT1str3':MT1str3, 'MT1str4':MT1str4, 'MT1str5':MT1str5, 'MT1str6':MT1str6, 'MT1str7':MT1str7, 'MT1str8':MT1str8, 'MT1str9':MT1str9, 'MT1str10':MT1str10, 'MT1str11':MT1str11, 
-        'options' : options, 'lenoptions' : len(options), 'optionsurl' :optoinsurl,
+        'options' : options, 'lenoptions' : len(options), 'optionsurl' :optoinsurl, 'points':Max_Points
         }) 
 
 
