@@ -47,7 +47,7 @@
         <div style="height: 400px; z-index: 10; float: left; position: absolute;">
         {% if ifCS2 == "True" %}
             {% for cs2 in CS2 %}
-                <div onclick="CS2overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;background-color: rgba(255, 255, 255, 0.5);color: rgba(255, 51, 0, 0.87);">
+                <div onclick="CS2overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;background-color: rgba(255, 255, 255, 0.5);color:gray;">
                     {{cs2.7}}
                 </div>
             {% endfor %}
@@ -55,7 +55,7 @@
 
         {% if ifMT1 == "True" %}
             {% for mt1 in MT1 %}
-                <div onclick="MT1overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;background-color: rgba(255, 255, 255, 0.5);color: rgba(255, 51, 0, 0.87);">
+                <div onclick="MT1overlayclick('{{forloop.counter}}');" style="cursor: pointer; font-size: 87%;background-color: rgba(255, 255, 255, 0.5);color:gray;">
                     {{mt1.7}} 
                 </div>        
             {% endfor %}
