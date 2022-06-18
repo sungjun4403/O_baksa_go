@@ -372,7 +372,7 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1): 
     MT1_nodes_7 = gotlst[3]
 
     routes = []
-    shrtstpaths = DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
+    shrtstpaths = ShortestPathALTH(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2)
     #DFSlst 0 : 모든 경우의 수 / 1 : 각 경우의 수 마다 길이 / 2 : 길이 순서 인덱스 리스트
 
     # getOptionStr(DFSlst, CS2_nodes_7, MT1_nodes_7)
@@ -432,7 +432,7 @@ def forMT1(SPL, DPL, ifsame, Max_Length):
     return rslt
 
 
-def DFSsearch(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
+def ShortestPathALTH(G, CS2_nodes, MT1_nodes, orgn, dstn, Max_Length, ifMT1, ifCS2):
     nodes_list = []
     if ifMT1 == "True": nodes_list += MT1_nodes
     if ifCS2 == "True": nodes_list += CS2_nodes
