@@ -34,8 +34,8 @@
     <br><br>
     <h4>
         Shortest Path 
-        {% if ifCS2 == "True" %}visiting {{points}} CS2{% endif %}
-        {% if ifMT1 == "True" %}visiting {{points}} MT1{% endif %}
+        {% if ifCS2 == "True" %}visiting {{points}} CVS{% endif %}
+        {% if ifMT1 == "True" %}visiting {{points}} Supermarket(s){% endif %}
         {% if ifMT1 != 'True' and ifCS2 != 'True' %}from Origin to Destination{% endif %}
     </h4>
     <br>
@@ -70,15 +70,15 @@
         <input class="form-check-input" onclick="drawcheck();" type="checkbox" value="" id="bsCheck">
         <label class="form-check-label" for="flexCheckChecked">선 그리기</label>
 
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="setMarkersBound();">setMarkersBound</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="setMarkersBound();">모든 마커 보이도록 지도 범위 설정</button>
         {% if ifCS2 == "True" %}
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showCS2();">show CS2</button>
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideCS2();">hide CS2</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showCS2();">편의점 마커 보기</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideCS2();">편의점 마커 숨기기</button>
         {% endif %}
 
         {% if ifMT1 == "True" %}
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showMT1();">show MT1</button>
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideMT1();">hide MT1</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="showMT1();">마트 마커 보기</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 3px;" onclick="hideMT1();">마트 마커 숨기기</button>
         {% endif %}
         <br><br>
         <form action = "{% url 'end' %}">
