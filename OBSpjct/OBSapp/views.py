@@ -567,7 +567,8 @@ def getOptionStr(apxroute, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes, SPL, 
         elat = L[names.index(OptionStr[q+1])][0]
         elng = L[names.index(OptionStr[q+1])][1]
         ename = OptionStr[q+1]
-        optionsurl.append('http://map.naver.com/index.nhn' 
+        optionsurl.append(
+        'http://map.naver.com/index.nhn' 
         + '?slng=' + slng 
         + '&slat=' + slat 
         + '&stext=' + sname
