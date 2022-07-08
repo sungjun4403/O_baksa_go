@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-uzu67ue$sed=%%($@-xisko&j4jgmk%!71%^48xdf*_e%&dtcr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '54.180.79.109', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com', 'ec2-3-38-227-250.ap-northeast-2.compute.amazonaws.com']
 
 
 # Application definition
