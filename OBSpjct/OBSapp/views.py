@@ -28,7 +28,7 @@ import queue
 import heapq
 
 matplotlib.use('Agg')
-ox.config(use_cache = True, log_console = True)
+ox.config(use_cache = True, log_console = False)
 # ox.settings.log_console=True
 ox.__version__
 
@@ -79,10 +79,10 @@ def get_options(request):
     if SPLformat == "loc":
         SPL[0] = ADDRESS
         SPL[2] = 'location'
-        print(str(SPL[0][:10]) + " " + str(SPL[0][12:])) 
-        print("=================")
-        print("location")
-        print("=================")
+        # print(str(SPL[0][:10]) + " " + str(SPL[0][12:])) 
+        # print("=================")
+        # print("location")
+        # print("=================")
     else:
         SPL = google_geocode(str(ADDRESS))
     
@@ -98,10 +98,10 @@ def get_options(request):
     if DPLformat == "loc":      #좌표계 형식
         DPL[0] = address
         DPL[2] = 'location'
-        print(str(DPL[0][:10]) + " " + str(DPL[0][12:])) 
-        print("=================")
-        print("location")
-        print("=================")
+        # print(str(DPL[0][:10]) + " " + str(DPL[0][12:])) 
+        # print("=================")
+        # print("location")
+        # print("=================")
     else:       #좌표계 아닌 형식 지오코딩
         DPL = google_geocode(str(address))
     
@@ -397,15 +397,15 @@ def get_map (ifsame, SPL, DPL, Max_Length, CS2L, MT1L, ifMT1, ifCS2, CS2, MT1): 
     
     
 
-    print()
-    print("===========================")
-    print(str(process_time) + " sec")
-    print(graph_type)
-    print(orgn, dstn)
-    print(CS2_nodes)
-    print(MT1_nodes)
-    print("===========================")
-    print()
+    # print()
+    # print("===========================")
+    # print(str(process_time) + " sec")
+    # print(graph_type)
+    # print(orgn, dstn)
+    # print(CS2_nodes)
+    # print(MT1_nodes)
+    # print("===========================")
+    # print()
 
     rtnlst = [shrtstpaths, CS2_nodes_7, MT1_nodes_7, CS2_nodes, MT1_nodes]
 

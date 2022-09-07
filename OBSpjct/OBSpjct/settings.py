@@ -11,13 +11,7 @@ DATABASES = configg.DATABASES
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 pymysql.install_as_MySQLdb()
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uzu67ue$sed=%%($@-xisko&j4jgmk%!71%^48xdf*_e%&dtcr'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com', 'ec2-3-38-227-250.ap-northeast-2.compute.amazonaws.com']
