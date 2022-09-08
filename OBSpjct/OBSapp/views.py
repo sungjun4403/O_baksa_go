@@ -28,7 +28,7 @@ import queue
 import heapq
 
 matplotlib.use('Agg')
-ox.settings(use_cache = True, log_console = False)
+ox.settings.use_cache = True
 # ox.settings.log_console=True
 ox.__version__
 
