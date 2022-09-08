@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 pymysql.install_as_MySQLdb()
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com', 'ec2-3-38-227-250.ap-northeast-2.compute.amazonaws.com']
 
