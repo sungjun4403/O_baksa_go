@@ -320,7 +320,7 @@ def lstTostr(lst, indx):
 def google_geocode (got_place):
     gmaps = googlemaps.Client(key = 'AIzaSyAawgC_tb1v8ro5BYuGs7BbhcuqYfI26ws')
     got_geocode = gmaps.geocode((got_place), language='ko')
-    print(got_geocode)
+    # print(got_geocode)
     lst = got_geocode
     llst = []       #[0] : location x, y / [1] : formatted_address / [2] : address_type 
     loc_to_append = str(lst[0].get('geometry').get('location').get('lat'))
