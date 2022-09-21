@@ -16,7 +16,7 @@
 
 </br>
 
-<a href = ""> 🌟 프로젝트 문서</a>
+<a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/Documents/OBS_%EC%B5%9C%EC%A2%85%EC%95%88.pdf"> 🌟 프로젝트 문서</a>
 
 <a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/%EC%82%AC%EC%9A%A9%EC%84%A4%EB%AA%85%EC%84%9C.md"> ⏯️ 시연 영상</a>
 
