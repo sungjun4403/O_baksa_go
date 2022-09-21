@@ -1,10 +1,10 @@
-<h1> 온라인 투표 웹 프로젝트 </h1>
+<h1> 오박사 Go 웹 배포 프로젝트 </h1>
 
 </br>
 
 - <a href="https://www.python.org/" title="Python"><img src="https://github.com/get-icon/geticon/raw/master/icons/python.svg" alt="Python" width="30px" height="30px"></a>&nbsp;&nbsp;
 <a href="https://www.djangoproject.com/" title="Django"><img src="https://github.com/get-icon/geticon/raw/master/icons/django.svg" alt="Django" width="30px" height="30px"></a>&nbsp;&nbsp;
-<a href="https://www.sqlite.org/index.html" title="SQLite"><img src="https://user-images.githubusercontent.com/96364048/191542708-cc130c01-43ec-431b-9947-2f257fa242e1.png" alt="SQLite" height="30px"></a>
+<a href="https://www.mysql.com/" title="MySQL"><img src="https://www.mysql.com/common/logos/logo-mysql-170x115.png" alt="MySQL" height="30px"></a>&nbsp;&nbsp;
 
 
 - <a href="https://www.w3.org/TR/html5/" title="HTML5"><img src="https://github.com/get-icon/geticon/raw/master/icons/html-5.svg" alt="HTML5" width="30px" height="30px"></a>&nbsp;&nbsp;
@@ -24,6 +24,8 @@
 <a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/%EC%82%AC%EC%9A%A9%EC%84%A4%EB%AA%85%EC%84%9C.md"> ⏯️ 시연 영상</a>
 
 <a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/Documents/Release.md"> 📋 개선 사항 </a>
+
+<a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/Documents/log.md"> 📋 개발 로그 및 이슈 기록 </a>
 
 </br> 
 
