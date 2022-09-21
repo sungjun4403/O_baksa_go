@@ -10,6 +10,7 @@
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="30px" height="30px"></a>&nbsp;&nbsp;
 
 - <a href="https://aws.amazon.com/ko/" title="Amazon Web Service"><img src="https://user-images.githubusercontent.com/96364048/191536751-53c5c41c-5ce2-4fcc-ae88-2f88da3eea6e.png" alt="Amazon Web Service" height="30px"></a>&nbsp;&nbsp;
+<a href="https://ubuntu.com/" title="Ubuntu"><img src="https://assets.ubuntu.com/v1/8dd99b80-ubuntu-logo14.png" alt="ubuntu" height="30px"></a>&nbsp;&nbsp;
 
 - <a href="https://code.visualstudio.com/" title="Visual Studio Code"><img src="https://github.com/get-icon/geticon/raw/master/icons/visual-studio-code.svg" alt="Visual Studio Code" width="30px" height="30px"></a>&nbsp;&nbsp;
 <a href="https://github.com" title="Github"><img src="https://user-images.githubusercontent.com/96364048/191507555-71f0f2b7-e275-4ab6-85ed-fb03247bdbda.png" alt="Github" width="30px" height="30px"></a>
