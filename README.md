@@ -20,6 +20,8 @@
 
 <a href = "https://github.com/sungjun4403/O_baksa_go/blob/main/%EC%82%AC%EC%9A%A9%EC%84%A4%EB%AA%85%EC%84%9C.md"> ⏯️ 시연 영상</a>
 
+<a href = ""> 📋 개선 사항 </a>
+
 </br> 
 
 __서비스 순서 :__
