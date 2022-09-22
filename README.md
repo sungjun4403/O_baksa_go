@@ -33,9 +33,24 @@
 
 </br> 
 
-__서비스 순서 :__
+프로젝트 목적 : __편의점 최다경유 최단경로 제공__ (포켓몬빵 '편의점 투어' 도움)
+
+서비스 순서 :
 
 - 정보입력 → 결과화면
+
+프로젝트 범위 : 기획, 개발, 배포, 운영
+
+</br>
+
+-----
+
+</br>
+
+서비스 화면 : 정보입력창(좌), 결과화면(우)
+
+<img style="float:left" width="375" src="https://user-images.githubusercontent.com/96364048/191868464-6d5968af-1744-42bb-9d74-4d0359e9155b.png">&ensp;<img style="float:right" width="400" src="https://user-images.githubusercontent.com/96364048/191868445-5e123c6c-b7d6-4e34-87ce-a1ed139a83e0.png">
+
 
 
 
