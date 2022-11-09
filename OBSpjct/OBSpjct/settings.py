@@ -14,7 +14,7 @@ pymysql.install_as_MySQLdb()
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com', 'ec2-3-38-227-250.ap-northeast-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '172.31.40.12', '3.38.227.250', 'www.obaksago.com', 'obaksago.com', 'ec2-3-38-227-250.ap-northeast-2.compute.amazonaws.com', '192.168.253.1', '10.0.2.15']
 
 
 # Application definition
