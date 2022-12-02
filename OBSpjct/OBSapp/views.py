@@ -30,6 +30,11 @@ import heapq
 matplotlib.use('Agg')
 ox.settings.use_cache = True
 # ox.settings.log_console=True
+''' IDK WHT TO DO
+IDK WHT TO DO
+IDK WHT TO DOIDK WHT TO DO
+IDK WHT TO DO
+'''
 ox.__version__
 
 def home (request):
